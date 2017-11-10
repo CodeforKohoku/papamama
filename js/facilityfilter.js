@@ -70,7 +70,9 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
     if(conditions['PubNinkaOpenTime']) {
         filterfunc = function (item, idx) {
             f = function (item,idx) {
-                var _open = new Date(2010, 0, 1, conditions['PubNinkaOpenTime'], 0, 0);
+                var openHour = conditions['PubNinkaOpenTime'].slice(0, conditions['PubNinkaOpenTime'].indexOf(":"));
+                var openMin = Number(conditions['PubNinkaOpenTime'].slice(-2));
+                var _open = new Date(2010, 0, 1, openHour, openMin, 0);
                 var open = item.properties['開園時間'] ? item.properties['開園時間'] : item.properties['Open'];
                 //各保育園の開園時間を変換
                 open = open.replace("：", ":");  //全角だったら半角に変更
@@ -89,7 +91,9 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
     if(conditions['PubNinkaCloseTime']) {
         filterfunc = function (item, idx) {
             f = function (item,idx) {
-                var _close = new Date(2010, 0, 1, conditions['PubNinkaCloseTime'], 0, 0);
+                var closeHour = conditions['PubNinkaCloseTime'].slice(0, conditions['PubNinkaCloseTime'].indexOf(":"));
+                var closeMin = Number(conditions['PubNinkaCloseTime'].slice(-2));
+                var _close = new Date(2010, 0, 1, closeHour, closeMin, 0);
                 var close = item.properties['終園時間'] ? item.properties['終園時間'] : item.properties['Close'];
                 //各保育園の終園時間を変換
                 close = close.replace("：", ":");  //全角だったら半角に変更
@@ -206,7 +210,9 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
     if(conditions['PriNinkaOpenTime']) {
         filterfunc = function (item, idx) {
             f = function (item,idx) {
-                var _open = new Date(2010, 0, 1, conditions['PriNinkaOpenTime'], 0, 0);
+                var openHour = conditions['PriNinkaOpenTime'].slice(0, conditions['PriNinkaOpenTime'].indexOf(":"));
+                var openMin = Number(conditions['PriNinkaOpenTime'].slice(-2));
+                var _open = new Date(2010, 0, 1, openHour, openMin, 0);
                 var open = item.properties['開園時間'] ? item.properties['開園時間'] : item.properties['Open'];
                 //各保育園の開園時間を変換
                 open = open.replace("：", ":");  //全角だったら半角に変更
@@ -225,7 +231,9 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
     if(conditions['PriNinkaCloseTime']) {
         filterfunc = function (item, idx) {
             f = function (item,idx) {
-                var _close = new Date(2010, 0, 1, conditions['PriNinkaCloseTime'], 0, 0);
+                var closeHour = conditions['PriNinkaCloseTime'].slice(0, conditions['PriNinkaCloseTime'].indexOf(":"));
+                var closeMin = Number(conditions['PriNinkaCloseTime'].slice(-2));
+                var _close = new Date(2010, 0, 1, closeHour, closeMin, 0);
                 var close = item.properties['終園時間'] ? item.properties['終園時間'] : item.properties['Close'];
                 //各保育園の終園時間を変換
                 close = close.replace("：", ":");  //全角だったら半角に変更
@@ -344,7 +352,9 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
     if(conditions['ninkagaiOpenTime']) {
         filterfunc = function (item, idx) {
             f = function (item,idx) {
-                var _open = new Date(2010, 0, 1, conditions['ninkagaiOpenTime'], 0, 0);
+                var openHour = conditions['ninkagaiOpenTime'].slice(0, conditions['ninkagaiOpenTime'].indexOf(":"));
+                var openMin = Number(conditions['ninkagaiOpenTime'].slice(-2));
+                var _open = new Date(2010, 0, 1, openHour, openMin, 0);
                 var open = item.properties['開園時間'] ? item.properties['開園時間'] : item.properties['Open'];
                 //各保育園の開園時間を変換
                 open = open.replace("：", ":");  //全角だったら半角に変更
@@ -363,7 +373,9 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
     if(conditions['ninkagaiCloseTime']) {
         filterfunc = function (item, idx) {
             f = function (item,idx) {
-                var _close = new Date(2010, 0, 1, conditions['ninkagaiCloseTime'], 0, 0);
+                var closeHour = conditions['ninkagaiCloseTime'].slice(0, conditions['ninkagaiCloseTime'].indexOf(":"));
+                var closeMin = Number(conditions['ninkagaiCloseTime'].slice(-2));
+                var _close = new Date(2010, 0, 1, closeHour, closeMin, 0);
                 var close = item.properties['終園時間'] ? item.properties['終園時間'] : item.properties['Close'];
                 //各保育園の終園時間を変換
                 close = close.replace("：", ":");  //全角だったら半角に変更
@@ -461,7 +473,9 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
     if(conditions['YhoikuOpenTime']) {
         filterfunc = function (item, idx) {
             f = function (item,idx) {
-                var _open = new Date(2010, 0, 1, conditions['YhoikuOpenTime'], 0, 0);
+                var openHour = conditions['YhoikuOpenTime'].slice(0, conditions['YhoikuOpenTime'].indexOf(":"));
+                var openMin = Number(conditions['YhoikuOpenTime'].slice(-2));
+                var _open = new Date(2010, 0, 1, openHour, openMin, 0);
                 var open = item.properties['開園時間'] ? item.properties['開園時間'] : item.properties['Open'];
                 //各保育園の開園時間を変換
                 open = open.replace("：", ":");  //全角だったら半角に変更
@@ -480,7 +494,9 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
     if(conditions['YhoikuCloseTime']) {
         filterfunc = function (item, idx) {
             f = function (item,idx) {
-                var _close = new Date(2010, 0, 1, conditions['YhoikuCloseTime'], 0, 0);
+                var closeHour = conditions['YhoikuCloseTime'].slice(0, conditions['YhoikuCloseTime'].indexOf(":"));
+                var closeMin = Number(conditions['YhoikuCloseTime'].slice(-2));
+                var _close = new Date(2010, 0, 1, closeHour, closeMin, 0);
                 var close = item.properties['終園時間'] ? item.properties['終園時間'] : item.properties['Close'];
                 //各保育園の終園時間を変換
                 close = close.replace("：", ":");  //全角だったら半角に変更
