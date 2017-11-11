@@ -455,6 +455,13 @@ $('#mainPage').on('pageshow', function() {
 		// レイヤー表示状態によって施設の表示を切り替える
 		//updateLayerStatus({ninka: ninka, ninkagai: ninkagai, yhoiku: yhoiku, kindergarten: kindergarten, jigyosho: jigyosho});  //2017-02 @kakiki upd
 		updateLayerStatus({pubNinka: pubNinka, priNinka: priNinka, ninkagai: ninkagai, yhoiku: yhoiku, kindergarten: kindergarten, jigyosho: jigyosho});
+
+		// ga('send', 'event', 'カテゴリ', 'アクション', 'ラベル', '値', { nonInteraction: 真偽値 } )
+		// *nonInteraction: trueはイベントが発生しても直帰率に影響せず、falseはイベントの呼び出しで直帰とみなされなくなる
+		ga('send', 'event', 'filter', 'click', this.id);
+		// 本イベントを直帰率へ反映させたくない場合は以下を使用すること。
+		// ga('send', 'event', 'filter', 'click', this.id, , { nonInteraction: true });
+		
 	});
 
 	// 絞込条件のリセット
