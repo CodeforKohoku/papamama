@@ -332,6 +332,7 @@ $('#mainPage').on('pageshow', function() {
 
     // 検索フィルターを有効にする
 	$('#filterApply').click(function(evt){
+
 		// 条件作成処理
 		conditions = [];
 		//ninka = ninkagai = yhoiku = kindergarten = jigyosho = false;		//2017-02 @kakiki upd
@@ -345,6 +346,10 @@ $('#mainPage').on('pageshow', function() {
 		}
 		if($('#PubNinkaCloseTime option:selected').val() !== "") {
 			conditions['PubNinkaCloseTime'] = $('#PubNinkaCloseTime option:selected').val();
+			pubNinka = true;
+		}
+		if($('#PubNinka24H').prop('checked')) {
+			conditions['PubNinka24H'] = "Y"; //1;
 			pubNinka = true;
 		}
 		if($('#PubNinkaIchijiHoiku').prop('checked')) {
@@ -371,6 +376,10 @@ $('#mainPage').on('pageshow', function() {
 		}
 		if($('#PriNinkaCloseTime option:selected').val() !== "") {
 			conditions['PriNinkaCloseTime'] = $('#PriNinkaCloseTime option:selected').val();
+			priNinka = true;
+		}
+		if($('#PriNinka24H').prop('checked')) {
+			conditions['PriNinka24H'] = "Y"; //1;
 			priNinka = true;
 		}
 		if($('#PriNinkaIchijiHoiku').prop('checked')) {
@@ -416,6 +425,10 @@ $('#mainPage').on('pageshow', function() {
 		}
 		if($('#YhoikuCloseTime option:selected').val() !== "") {
 			conditions['YhoikuCloseTime'] = $('#YhoikuCloseTime option:selected').val();
+			yhoiku = true;
+		}
+		if($('#Yhoiku24H').prop('checked')) {
+			conditions['Yhoiku24H'] = "Y"; //1;
 			yhoiku = true;
 		}
 		if($('#YhoikuIchijiHoiku').prop('checked')) {

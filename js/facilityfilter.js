@@ -157,6 +157,17 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
         pubNinkaFeatures = pubNinkaFeatures.filter(filterfunc);
     }
 */
+
+    // 公立認可保育所：24時間
+    if(conditions['PubNinka24H']) {
+        filterfunc = function (item,idx) {
+            var h24 = item.properties['H24'] ? item.properties['H24'] : item.properties['H24'];
+            if(h24 === conditions['PubNinka24H']) {
+                return true;
+            }
+        };
+        pubNinkaFeatures = pubNinkaFeatures.filter(filterfunc);
+    }
     // 公立認可保育所：一時
     if(conditions['PubNinkaIchijiHoiku']) {
         filterfunc = function (item,idx) {
@@ -299,6 +310,17 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
         priNinkaFeatures = priNinkaFeatures.filter(filterfunc);
     }
 */
+
+    // 私立認可保育所：24時間
+    if(conditions['PriNinka24H']) {
+        filterfunc = function (item,idx) {
+            var h24 = item.properties['H24'] ? item.properties['H24'] : item.properties['H24'];
+            if(h24 === conditions['PriNinka24H']) {
+                return true;
+            }
+        };
+        priNinkaFeatures = priNinkaFeatures.filter(filterfunc);
+    }
     // 私立認可保育所：一時
     if(conditions['PriNinkaIchijiHoiku']) {
         filterfunc = function (item,idx) {
@@ -560,6 +582,17 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
         yhoikuFeatures = yhoikuFeatures.filter(filterfunc);
     }
 */
+
+    // 横浜保育室：24時間
+    if(conditions['Yhoiku24H']) {
+        filterfunc = function (item,idx) {
+            var h24 = item.properties['H24'] ? item.properties['H24'] : item.properties['H24'];
+            if(h24 === conditions['Yhoiku24H']) {
+                return true;
+            }
+        };
+        yhoikuFeatures = yhoikuFeatures.filter(filterfunc);
+    }
     // 横浜保育室：一時
     if(conditions['YhoikuIchijiHoiku']) {
         filterfunc = function (item,idx) {
