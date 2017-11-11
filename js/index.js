@@ -364,6 +364,10 @@ $('#mainPage').on('pageshow', function() {
 			conditions['PubNinkaKyujitu'] = "Y"; //1;
 			pubNinka = true;
 		}
+		if($('#PubNinkaEncho').prop('checked')) {
+			conditions['PubNinkaEncho'] = "Y"; //1;
+			pubNinka = true;
+		}
 		if($('#PubNinkaVacancy').prop('checked')) {
 			conditions['PubNinkaVacancy'] = "Y"; //1;
 			pubNinka = true;
@@ -394,6 +398,10 @@ $('#mainPage').on('pageshow', function() {
 			conditions['PriNinkaKyujitu'] = "Y"; //1;
 			priNinka = true;
 		}
+		if($('#PriNinkaEncho').prop('checked')) {
+			conditions['PriNinkaEncho'] = "Y"; //1;
+			priNinka = true;
+		}
 		if($('#PriNinkaVacancy').prop('checked')) {
 			conditions['PriNinkaVacancy'] = "Y"; //1;
 			priNinka = true;
@@ -411,6 +419,10 @@ $('#mainPage').on('pageshow', function() {
 		}
 		if($('#ninkagai24H').prop('checked')) {
 			conditions['ninkagai24H'] = "Y"; //1;
+			ninkagai = true;
+		}
+		if($('#ninkagaiEncho').prop('checked')) {
+			conditions['ninkagaiEncho'] = "Y"; //1;
 			ninkagai = true;
 		}
 		if($('#ninkagaiShomei').prop('checked')) {
@@ -441,6 +453,10 @@ $('#mainPage').on('pageshow', function() {
 		}
 		if($('#YhoikuKyujitu').prop('checked')) {
 			conditions['YhoikuKyujitu'] = "Y"; //1;
+			yhoiku = true;
+		}
+		if($('#YhoikuEncho').prop('checked')) {
+			conditions['YhoikuEncho'] = "Y"; //1;
 			yhoiku = true;
 		}
 		if($('#YhoikuVacancy').prop('checked')) {

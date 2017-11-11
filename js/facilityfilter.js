@@ -201,6 +201,16 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
         };
         pubNinkaFeatures = pubNinkaFeatures.filter(filterfunc);
     }
+    // 公立認可保育所：延長保育
+    if(conditions['PubNinkaEncho']) {
+        filterfunc = function (item,idx) {
+            var extra = item.properties['延長保育'] ? item.properties['延長保育'] : item.properties['Extra'];
+            if(extra === conditions['PubNinkaEncho']) {
+                return true;
+            }
+        };
+        pubNinkaFeatures = pubNinkaFeatures.filter(filterfunc);
+    }
     // 公立認可保育所：空きあり
     if(conditions['PubNinkaVacancy']) {
         filterfunc = function (item,idx) {
@@ -354,6 +364,16 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
         };
         priNinkaFeatures = priNinkaFeatures.filter(filterfunc);
     }
+    // 私立認可保育所：延長保育
+    if(conditions['PriNinkaEncho']) {
+        filterfunc = function (item,idx) {
+            var extra = item.properties['延長保育'] ? item.properties['延長保育'] : item.properties['Extra'];
+            if(extra === conditions['PriNinkaEncho']) {
+                return true;
+            }
+        };
+        priNinkaFeatures = priNinkaFeatures.filter(filterfunc);
+    }
     // 私立認可保育所：空きあり
     if(conditions['PriNinkaVacancy']) {
         filterfunc = function (item,idx) {
@@ -469,6 +489,16 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
             var h24 = item.properties['H24'] ? item.properties['H24'] : item.properties['H24'];
 //            if(h24 !== null) { //2017-02 kakiki-upd
             if(h24 === conditions['ninkagai24H']) {
+                return true;
+            }
+        };
+        ninkagaiFeatures = ninkagaiFeatures.filter(filterfunc);
+    }
+    // 認可外保育所：延長保育
+    if(conditions['ninkagaiEncho']) {
+        filterfunc = function (item,idx) {
+            var extra = item.properties['延長保育'] ? item.properties['延長保育'] : item.properties['Extra'];
+            if(extra === conditions['ninkagaiEncho']) {
                 return true;
             }
         };
@@ -621,6 +651,16 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
             var holiday = item.properties['休日'] ? item.properties['休日'] : item.properties['Holiday'];
 //            if(holiday !== null) { //2017-02 kakiki-upd
             if(holiday === conditions['YhoikuKyujitu']) {
+                return true;
+            }
+        };
+        yhoikuFeatures = yhoikuFeatures.filter(filterfunc);
+    }
+    // 横浜保育室：延長保育
+    if(conditions['YhoikuEncho']) {
+        filterfunc = function (item,idx) {
+            var extra = item.properties['延長保育'] ? item.properties['延長保育'] : item.properties['Extra'];
+            if(extra === conditions['YhoikuEncho']) {
                 return true;
             }
         };
