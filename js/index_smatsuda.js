@@ -16,6 +16,7 @@ var openTime = function () {
 	document.getElementById("PriNinkaOpenTime").innerHTML = options;
 	document.getElementById("YhoikuOpenTime").innerHTML = options;
 	document.getElementById("ninkagaiOpenTime").innerHTML = options;
+	document.getElementById("KindergartenOpenTime").innerHTML = options;
 }
 openTime();
 
@@ -35,5 +36,6 @@ var CloseTime = function () {
 	document.getElementById("PriNinkaCloseTime").innerHTML = options;
 	document.getElementById("YhoikuCloseTime").innerHTML = options;
 	document.getElementById("ninkagaiCloseTime").innerHTML = options;
+	document.getElementById("KindergartenCloseTime").innerHTML = options;
 }
 CloseTime();

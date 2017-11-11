@@ -467,6 +467,39 @@ $('#mainPage').on('pageshow', function() {
 		// 小規模・事業所内保育事業：未対応
 
 		// 幼稚園
+		if($('#KindergartenOpenTime option:selected').val() !== "") {
+			conditions['KindergartenOpenTime'] = $('#KindergartenOpenTime option:selected').val();
+			kindergarten = true;
+		}
+		if($('#KindergartenCloseTime option:selected').val() !== "") {
+			conditions['KindergartenCloseTime'] = $('#KindergartenCloseTime option:selected').val();
+			kindergarten = true;
+		}
+		if($('#Kindergarten24H').prop('checked')) {
+			conditions['Kindergarten24H'] = "Y"; //1;
+			kindergarten = true;
+		}
+		if($('#KindergartenIchijiHoiku').prop('checked')) {
+			conditions['KindergartenIchijiHoiku'] = "Y"; //1;
+			kindergarten = true;
+		}
+		if($('#KindergartenYakan').prop('checked')) {
+			conditions['KindergartenYakan'] = "Y"; //1;
+			kindergarten = true;
+		}
+		if($('#KindergartenKyujitu').prop('checked')) {
+			conditions['KindergartenKyujitu'] = "Y"; //1;
+			kindergarten = true;
+		}
+		if($('#KindergartenEncho').prop('checked')) {
+			conditions['KindergartenEncho'] = "Y"; //1;
+			kindergarten = true;
+		}
+		if($('#KindergartenVacancy').prop('checked')) {
+			conditions['KindergartenVacancy'] = "Y"; //1;
+			kindergarten = true;
+		}
+
 
 		// フィルター適用時
 		if(Object.keys(conditions).length > 0) {

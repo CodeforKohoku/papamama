@@ -53,12 +53,12 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
     /* 2017-02 @kakiki ins-end */
 
     // 幼稚園の検索元データを取得
-    var youchienFeatures = [];
+    var kindergartenFeatures = [];
     _features = nurseryFacilities.features.filter(function (item,idx) {
             var type = item.properties['種別'] ? item.properties['種別'] : item.properties['Type'];
             if(type == "幼稚園") return true;
         });
-    Array.prototype.push.apply(youchienFeatures, _features);
+    Array.prototype.push.apply(kindergartenFeatures, _features);
 
     // 小規模保育・事業所内の検索元データを取得
     // 未対応(2017-02現在)
@@ -682,7 +682,116 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
     // ----------------------------------------------------------------------
     // 幼稚園向けフィルター
     // ----------------------------------------------------------------------
-    // まだ用意しない
+    // ----------------------------------------------------------------------
+    // 幼稚園：開園時間
+    if(conditions['KindergartenOpenTime']) {
+        filterfunc = function (item, idx) {
+            f = function (item,idx) {
+                var openHour = conditions['KindergartenOpenTime'].slice(0, conditions['KindergartenOpenTime'].indexOf(":"));
+                var openMin = Number(conditions['KindergartenOpenTime'].slice(-2));
+                var _open = new Date(2010, 0, 1, openHour, openMin, 0);
+                var open = item.properties['開園時間'] ? item.properties['開園時間'] : item.properties['Open'];
+                //各保育園の開園時間を変換
+                open = open.replace("：", ":");  //全角だったら半角に変更
+                var hour = open.slice(0, open.indexOf(":"));
+                var min = open.slice(-2);
+                var open_time = new Date(2010, 0, 1, hour, min, 0);
+                if(open !== "" && open_time <= _open) {
+                    return true;
+                }
+            };
+            return f(item,idx);
+        };
+        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
+    }
+    // 幼稚園：終園時間
+    if(conditions['KindergartenCloseTime']) {
+        filterfunc = function (item, idx) {
+            f = function (item,idx) {
+                var closeHour = conditions['KindergartenCloseTime'].slice(0, conditions['KindergartenCloseTime'].indexOf(":"));
+                var closeMin = Number(conditions['KindergartenCloseTime'].slice(-2));
+                var _close = new Date(2010, 0, 1, closeHour, closeMin, 0);
+                var close = item.properties['終園時間'] ? item.properties['終園時間'] : item.properties['Close'];
+                //各保育園の終園時間を変換
+                close = close.replace("：", ":");  //全角だったら半角に変更
+                var hour = close.slice(0, close.indexOf(":"));
+                if(hour !== "" && hour <= 12) {hour = hour + 24};  //終園時間が24時過ぎの場合翌日扱い
+                var min = close.slice(-2);
+                var close_time = new Date(2010, 0, 1, hour, min, 0);
+                if(close_time >= _close) {
+                      return true;
+                  }
+            };
+            return f(item,idx);
+        };
+
+        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
+    }
+    // 幼稚園：24時間
+    if(conditions['Kindergarten24H']) {
+        filterfunc = function (item,idx) {
+            var h24 = item.properties['H24'] ? item.properties['H24'] : item.properties['H24'];
+            if(h24 === conditions['Kindergarten24H']) {
+                return true;
+            }
+        };
+        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
+    }
+    // 幼稚園：一時
+    if(conditions['KindergartenIchijiHoiku']) {
+        filterfunc = function (item,idx) {
+            var temp = item.properties['一時'] ? item.properties['一時'] : item.properties['Temp'];
+//            if(temp !== null) { //2017-02 kakiki-upd
+            if(temp === conditions['KindergartenIchijiHoiku']) {
+                return true;
+            }
+        };
+        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
+    }
+    // 幼稚園：夜間
+    if(conditions['KindergartenYakan']) {
+        filterfunc = function (item,idx) {
+            var night = item.properties['夜間'] ? item.properties['夜間'] : item.properties['Night'];
+//            if(night !== null) { //2017-02 kakiki-upd
+            if(night === conditions['KindergartenYakan']) {
+                return true;
+            }
+        };
+        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
+    }
+    // 幼稚園：休日
+    if(conditions['KindergartenKyujitu']) {
+        filterfunc = function (item,idx) {
+            var holiday = item.properties['休日'] ? item.properties['休日'] : item.properties['Holiday'];
+//            if(holiday !== null) { //2017-02 kakiki-upd
+            if(holiday === conditions['KindergartenKyujitu']) {
+                return true;
+            }
+        };
+        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
+    }
+    // 幼稚園：延長保育
+    if(conditions['KindergartenEncho']) {
+        filterfunc = function (item,idx) {
+            var extra = item.properties['延長保育'] ? item.properties['延長保育'] : item.properties['Extra'];
+            if(extra === conditions['KindergartenEncho']) {
+                return true;
+            }
+        };
+        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
+    }
+    // 幼稚園：空きあり
+    if(conditions['KindergartenVacancy']) {
+        filterfunc = function (item,idx) {
+            var vacancy = item.properties['Vacancy'] ? item.properties['Vacancy'] : item.properties['Vacancy'];
+//            if(vacancy !== null) { //2017-02 kakiki-upd
+            if(vacancy === conditions['KindergartenVacancy']) {
+                return true;
+            }
+        };
+        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
+    }
+
 
     // 戻り値の作成
     var features = [];
@@ -690,7 +799,7 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
     Array.prototype.push.apply(features, priNinkaFeatures);
     Array.prototype.push.apply(features, pubNinkaFeatures);
     Array.prototype.push.apply(features, ninkagaiFeatures);
-    Array.prototype.push.apply(features, youchienFeatures);
+    Array.prototype.push.apply(features, kindergartenFeatures);
     Array.prototype.push.apply(features, yhoikuFeatures);   //2017-02 kakiki-ins
     // console.log("getFilteredFeaturesGeoJson: return value: ", features.length);
     newGeoJson.features = features;
