@@ -16,792 +16,260 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
         "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
         "features":[]
     };
-    // console.log("getFilteredFeaturesGeoJson");
 
-    // 私立認可保育園の検索元データを取得
-    var priNinkaFeatures = [];
-    _features = nurseryFacilities.features.filter(function (item,idx) {
-            var type = item.properties['種別'] ? item.properties['種別'] : item.properties['Type'];
-            if(type == "私立認可保育所") return true;
-        });
-    Array.prototype.push.apply(priNinkaFeatures, _features);
+    var getFilteredType = function (typeFeatures, typeName) {
+      _features = nurseryFacilities.features.filter(function (item,idx) {
+              var type = item.properties['種別'] ? item.properties['種別'] : item.properties['Type'];
+              if(type == typeName) return true;
+          });
+      Array.prototype.push.apply(typeFeatures, _features);
+    }
 
     // 公立認可保育園の検索元データを取得
     var pubNinkaFeatures = [];
-    _features = nurseryFacilities.features.filter(function (item,idx) {
-            var type = item.properties['種別'] ? item.properties['種別'] : item.properties['Type'];
-            if(type == "公立認可保育所") return true;
-        });
-    Array.prototype.push.apply(pubNinkaFeatures, _features);
+    getFilteredType(pubNinkaFeatures, "公立認可保育所")
+
+    // 私立認可保育園の検索元データを取得
+    var priNinkaFeatures = [];
+    getFilteredType(priNinkaFeatures, "私立認可保育所")
 
     // 認可外保育園の検索元データを取得
     var ninkagaiFeatures = [];
-    _features = nurseryFacilities.features.filter(function (item,idx) {
-            var type = item.properties['種別'] ? item.properties['種別'] : item.properties['Type'];
-            if(type == "認可外保育施設") return true;
-        });
-    Array.prototype.push.apply(ninkagaiFeatures, _features);
+    getFilteredType(ninkagaiFeatures, "認可外保育施設")
 
-    /* 2017-02 @kakiki ins-st */
     // 横浜保育室の検索元データを取得
     var yhoikuFeatures = [];
-    _features = nurseryFacilities.features.filter(function (item,idx) {
-            var type = item.properties['種別'] ? item.properties['種別'] : item.properties['Type'];
-            if(type == "横浜保育室") return true;
-        });
-    Array.prototype.push.apply(yhoikuFeatures, _features);
-    /* 2017-02 @kakiki ins-end */
-
+    getFilteredType(yhoikuFeatures, "横浜保育室")
+    
     // 幼稚園の検索元データを取得
     var kindergartenFeatures = [];
-    _features = nurseryFacilities.features.filter(function (item,idx) {
-            var type = item.properties['種別'] ? item.properties['種別'] : item.properties['Type'];
-            if(type == "幼稚園") return true;
-        });
-    Array.prototype.push.apply(kindergartenFeatures, _features);
+    getFilteredType(kindergartenFeatures, "幼稚園")
 
-    // 小規模保育・事業所内の検索元データを取得
-    // 未対応(2017-02現在)
+
+    var ifOpenTime = function (typeFeatures,conditionName) {
+      filterfunc = function (item, idx) {
+          f = function (item,idx) {
+              var openHour = conditionName.slice(0, conditionName.indexOf(":"));
+              var openMin = Number(conditionName.slice(-2));
+              var _open = new Date(2010, 0, 1, openHour, openMin, 0);
+              var open = item.properties['開園時間'] ? item.properties['開園時間'] : item.properties['Open'];
+              //各保育園の開園時間を変換
+              open = open.replace("：", ":");  //全角だったら半角に変更
+              var hour = open.slice(0, open.indexOf(":"));
+              var min = open.slice(-2);
+              var open_time = new Date(2010, 0, 1, hour, min, 0);
+              if(open !== "" && open_time <= _open) {
+                  return true;
+              }
+          };
+          return f(item,idx);
+      };
+      return typeFeatures.filter(filterfunc);
+    };
+
+    var ifCloseTime = function (typeFeatures,conditionName) {
+      filterfunc = function (item, idx) {
+          f = function (item,idx) {
+              var closeHour = conditionName.slice(0, conditionName.indexOf(":"));
+              var closeMin = Number(conditionName.slice(-2));
+              var _close = new Date(2010, 0, 1, closeHour, closeMin, 0);
+              var close = item.properties['終園時間'] ? item.properties['終園時間'] : item.properties['Close'];
+              //各保育園の終園時間を変換
+              close = close.replace("：", ":");  //全角だったら半角に変更
+              var hour = close.slice(0, close.indexOf(":"));
+              if(hour !== "" && hour <= 12) {hour = hour + 24};  //終園時間が24時過ぎの場合翌日扱い
+              var min = close.slice(-2);
+              var close_time = new Date(2010, 0, 1, hour, min, 0);
+              if(close_time >= _close) {
+                  return true;
+              }
+          };
+          return f(item,idx);
+      };
+      return typeFeatures.filter(filterfunc);
+    };
+
+    var if24H = function (typeFeatures,conditionName) {
+      filterfunc = function (item, idx) {
+          f = function (item,idx) {
+              var h24 = item.properties['H24'] ? item.properties['H24'] : item.properties['H24'];
+              if(h24 === conditionName) {
+                  return true;
+              }
+          };
+          return f(item,idx);
+      };
+      return typeFeatures.filter(filterfunc);
+    };
+
+    var ifIchijiHoiku = function (typeFeatures,conditionName) {
+      filterfunc = function (item, idx) {
+          f = function (item,idx) {
+              var temp = item.properties['一時'] ? item.properties['一時'] : item.properties['Temp'];
+              if(temp === conditionName) {
+                    return true;
+                }
+          };
+          return f(item,idx);
+      };
+      return typeFeatures.filter(filterfunc);
+    };
+
+    var ifYakan = function (typeFeatures,conditionName) {
+      filterfunc = function (item, idx) {
+          f = function (item,idx) {
+              var night = item.properties['夜間'] ? item.properties['夜間'] : item.properties['Night'];
+              if(night === conditionName) {
+                    return true;
+                }
+          };
+          return f(item,idx);
+      };
+      return typeFeatures.filter(filterfunc);
+    };
+
+    var ifKyujitu = function (typeFeatures,conditionName) {
+      filterfunc = function (item, idx) {
+          f = function (item,idx) {
+              var holiday = item.properties['休日'] ? item.properties['休日'] : item.properties['Holiday'];
+              if(holiday === conditionName) {
+                    return true;
+                }
+          };
+          return f(item,idx);
+      };
+      return typeFeatures.filter(filterfunc);
+    };
+
+    var ifEncho = function (typeFeatures,conditionName) {
+      filterfunc = function (item, idx) {
+          f = function (item,idx) {
+              var extra = item.properties['延長保育'] ? item.properties['延長保育'] : item.properties['Extra'];
+              if(extra === conditionName) {
+                    return true;
+                }
+          };
+          return f(item,idx);
+      };
+      return typeFeatures.filter(filterfunc);
+    };
+
+    var ifVacancy = function (typeFeatures,conditionName) {
+      filterfunc = function (item, idx) {
+          f = function (item,idx) {
+              var vacancy = item.properties['Vacancy'] ? item.properties['Vacancy'] : item.properties['Vacancy'];
+              if(vacancy === conditionName) {
+                    return true;
+                }
+          };
+          return f(item,idx);
+      };
+      return typeFeatures.filter(filterfunc);
+    };
+
+    var ifConditions = function (typeFeatures,
+      openTime,
+      closeTime,
+      twentyFour,
+      ichijiHoiku,
+      yakan,
+      kyujitu,
+      encho,
+      vacancy,
+    )
+    {
+        // 開園時間
+        if(openTime) typeFeatures = ifOpenTime(typeFeatures, openTime);
+        // 終園時間
+        if(closeTime) typeFeatures = ifCloseTime(typeFeatures, closeTime);
+        // 24時間
+        if(twentyFour) typeFeatures = if24H(typeFeatures, twentyFour);
+        // 一時
+        if(ichijiHoiku) typeFeatures = ifIchijiHoiku(typeFeatures, ichijiHoiku);
+        // 夜間
+        if(yakan) typeFeatures = ifYakan(typeFeatures, yakan);
+        // 休日
+        if(kyujitu) typeFeatures = ifKyujitu(typeFeatures, kyujitu);
+        // 延長保育
+        if(encho) typeFeatures = ifEncho(typeFeatures, encho);
+        // 空きあり
+        if(vacancy) typeFeatures = ifVacancy(typeFeatures, vacancy);
+        return typeFeatures;
+    };
 
     // ----------------------------------------------------------------------
     // 公立認可保育所向けフィルター(2017-02 kakiki 公立/認可対応)
     // ----------------------------------------------------------------------
-    // 公立認可保育所：開園時間  --2017-02 kakiki 開園/終園時間の比較方法を変更
-    if(conditions['PubNinkaOpenTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                var openHour = conditions['PubNinkaOpenTime'].slice(0, conditions['PubNinkaOpenTime'].indexOf(":"));
-                var openMin = Number(conditions['PubNinkaOpenTime'].slice(-2));
-                var _open = new Date(2010, 0, 1, openHour, openMin, 0);
-                var open = item.properties['開園時間'] ? item.properties['開園時間'] : item.properties['Open'];
-                //各保育園の開園時間を変換
-                open = open.replace("：", ":");  //全角だったら半角に変更
-                var hour = open.slice(0, open.indexOf(":"));
-                var min = open.slice(-2);
-                var open_time = new Date(2010, 0, 1, hour, min, 0);
-                if(open !== "" && open_time <= _open) {
-                    return true;
-                }
-            };
-            return f(item,idx);
-        };
-        pubNinkaFeatures = pubNinkaFeatures.filter(filterfunc);
-    }
-    // 公立認可保育所：終園時間
-    if(conditions['PubNinkaCloseTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                var closeHour = conditions['PubNinkaCloseTime'].slice(0, conditions['PubNinkaCloseTime'].indexOf(":"));
-                var closeMin = Number(conditions['PubNinkaCloseTime'].slice(-2));
-                var _close = new Date(2010, 0, 1, closeHour, closeMin, 0);
-                var close = item.properties['終園時間'] ? item.properties['終園時間'] : item.properties['Close'];
-                //各保育園の終園時間を変換
-                close = close.replace("：", ":");  //全角だったら半角に変更
-                var hour = close.slice(0, close.indexOf(":"));
-                if(hour !== "" && hour <= 12) {hour = hour + 24};  //終園時間が24時過ぎの場合翌日扱い
-                var min = close.slice(-2);
-                var close_time = new Date(2010, 0, 1, hour, min, 0);
-                if(close_time >= _close) {
-                      return true;
-                  }
-            };
-            return f(item,idx);
-        };
-
-        pubNinkaFeatures = pubNinkaFeatures.filter(filterfunc);
-    }
-    /*  元ソース
-    // 公立認可保育所：開園時間
-    if(conditions['PubNinkaOpenTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                var _time = conditions['PubNinkaOpenTime'] + ":00";
-                var open = item.properties['開園時間'] ? item.properties['開園時間'] : item.properties['Open'];
-                if(open == _time) {
-                    return true;
-                }
-            };
-            return f(item,idx);
-        };
-        pubNinkaFeatures = pubNinkaFeatures.filter(filterfunc);
-    }
-    // 公立認可保育所：終園時間
-    if(conditions['PubNinkaCloseTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                switch(conditions['PubNinkaCloseTime']) {
-                    case "18":
-                        checkAry = ["18:00","19:00","20:00","22:00","0:00"];
-                        break;
-                    case "19":
-                        checkAry = ["19:00","20:00","22:00","0:00"];
-                        break;
-                    case "20":
-                        checkAry = ["20:00","22:00","0:00"];
-                        break;
-                    case "22":
-                        checkAry = ["22:00","0:00"];
-                        break;
-                    case "24":
-                        checkAry = ["0:00"];
-                        break;
-                }
-                var close = item.properties['終園時間'] ? item.properties['終園時間'] : item.properties['Close'];
-                if($.inArray(close, checkAry) >= 0) {
-                    return true;
-                }
-            };
-            return f(item,idx);
-        };
-
-        pubNinkaFeatures = pubNinkaFeatures.filter(filterfunc);
-    }
-*/
-
-    // 公立認可保育所：24時間
-    if(conditions['PubNinka24H']) {
-        filterfunc = function (item,idx) {
-            var h24 = item.properties['H24'] ? item.properties['H24'] : item.properties['H24'];
-            if(h24 === conditions['PubNinka24H']) {
-                return true;
-            }
-        };
-        pubNinkaFeatures = pubNinkaFeatures.filter(filterfunc);
-    }
-    // 公立認可保育所：一時
-    if(conditions['PubNinkaIchijiHoiku']) {
-        filterfunc = function (item,idx) {
-            var temp = item.properties['一時'] ? item.properties['一時'] : item.properties['Temp'];
-//            if(temp !== null) { //2017-02 kakiki-upd
-            if(temp === conditions['PubNinkaIchijiHoiku']) {
-                return true;
-            }
-        };
-        pubNinkaFeatures = pubNinkaFeatures.filter(filterfunc);
-    }
-    // 公立認可保育所：夜間
-    if(conditions['PubNinkaYakan']) {
-        filterfunc = function (item,idx) {
-            var night = item.properties['夜間'] ? item.properties['夜間'] : item.properties['Night'];
-//            if(night !== null) { //2017-02 kakiki-upd
-            if(night === conditions['PubNinkaYakan']) {
-                return true;
-            }
-        };
-        pubNinkaFeatures = pubNinkaFeatures.filter(filterfunc);
-    }
-    // 公立認可保育所：休日
-    if(conditions['PubNinkaKyujitu']) {
-        filterfunc = function (item,idx) {
-            var holiday = item.properties['休日'] ? item.properties['休日'] : item.properties['Holiday'];
-//            if(holiday !== null) { //2017-02 kakiki-upd
-            if(holiday === conditions['PubNinkaKyujitu']) {
-                return true;
-            }
-        };
-        pubNinkaFeatures = pubNinkaFeatures.filter(filterfunc);
-    }
-    // 公立認可保育所：延長保育
-    if(conditions['PubNinkaEncho']) {
-        filterfunc = function (item,idx) {
-            var extra = item.properties['延長保育'] ? item.properties['延長保育'] : item.properties['Extra'];
-            if(extra === conditions['PubNinkaEncho']) {
-                return true;
-            }
-        };
-        pubNinkaFeatures = pubNinkaFeatures.filter(filterfunc);
-    }
-    // 公立認可保育所：空きあり
-    if(conditions['PubNinkaVacancy']) {
-        filterfunc = function (item,idx) {
-            var vacancy = item.properties['Vacancy'] ? item.properties['Vacancy'] : item.properties['Vacancy'];
-//            if(vacancy !== null) { //2017-02 kakiki-upd
-            if(vacancy === conditions['PubNinkaVacancy']) {
-                return true;
-            }
-        };
-        pubNinkaFeatures = pubNinkaFeatures.filter(filterfunc);
-    }
-    // console.log("[after]ninkaFeatures length:", ninkaFeatures.length);
-
+    pubNinkaFeatures = ifConditions(pubNinkaFeatures,
+      conditions['PubNinkaOpenTime'],
+      conditions['PubNinkaCloseTime'],
+      conditions['PubNinka24H'],
+      conditions['PubNinkaIchijiHoiku'],
+      conditions['PubNinkaYakan'],
+      conditions['PubNinkaKyujitu'],
+      conditions['PubNinkaEncho'],
+      conditions['PubNinkaVacancy']
+    );
     // ----------------------------------------------------------------------
     // 私立認可保育所向けフィルター(2017-02 kakiki 公立/私立認可対応)
     // ----------------------------------------------------------------------
-    // 私立認可保育所：開園時間  --2017-02 kakiki 開園/終園時間の比較方法を変更
-    if(conditions['PriNinkaOpenTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                var openHour = conditions['PriNinkaOpenTime'].slice(0, conditions['PriNinkaOpenTime'].indexOf(":"));
-                var openMin = Number(conditions['PriNinkaOpenTime'].slice(-2));
-                var _open = new Date(2010, 0, 1, openHour, openMin, 0);
-                var open = item.properties['開園時間'] ? item.properties['開園時間'] : item.properties['Open'];
-                //各保育園の開園時間を変換
-                open = open.replace("：", ":");  //全角だったら半角に変更
-                var hour = open.slice(0, open.indexOf(":"));
-                var min = open.slice(-2);
-                var open_time = new Date(2010, 0, 1, hour, min, 0);
-                if(open !== "" && open_time <= _open) {
-                    return true;
-                }
-            };
-            return f(item,idx);
-        };
-        priNinkaFeatures = priNinkaFeatures.filter(filterfunc);
-    }
-    // 私立認可保育所：終園時間
-    if(conditions['PriNinkaCloseTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                var closeHour = conditions['PriNinkaCloseTime'].slice(0, conditions['PriNinkaCloseTime'].indexOf(":"));
-                var closeMin = Number(conditions['PriNinkaCloseTime'].slice(-2));
-                var _close = new Date(2010, 0, 1, closeHour, closeMin, 0);
-                var close = item.properties['終園時間'] ? item.properties['終園時間'] : item.properties['Close'];
-                //各保育園の終園時間を変換
-                close = close.replace("：", ":");  //全角だったら半角に変更
-                var hour = close.slice(0, close.indexOf(":"));
-                if(hour !== "" && hour <= 12) {hour = hour + 24};  //終園時間が24時過ぎの場合翌日扱い
-                var min = close.slice(-2);
-                var close_time = new Date(2010, 0, 1, hour, min, 0);
-                if(close_time >= _close) {
-                      return true;
-                  }
-            };
-            return f(item,idx);
-        };
-
-        priNinkaFeatures = priNinkaFeatures.filter(filterfunc);
-    }
-
-/*
-    // 私立認可保育所：開園時間
-    // console.log("[before]priNinkaFeatures length:", priNinkaFeatures.length);
-    if(conditions['PriNinkaOpenTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                var _time = conditions['PriNinkaOpenTime'] + ":00";
-                var open = item.properties['開園時間'] ? item.properties['開園時間'] : item.properties['Open'];
-                if(open == _time) {
-                    return true;
-                }
-            };
-            return f(item,idx);
-        };
-        priNinkaFeatures = priNinkaFeatures.filter(filterfunc);
-    }
-    // 私立認可保育所：終園時間
-    if(conditions['PriNinkaCloseTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                switch(conditions['PriNinkaCloseTime']) {
-                    case "18":
-                        checkAry = ["18:00","19:00","20:00","22:00","0:00"];
-                        break;
-                    case "19":
-                        checkAry = ["19:00","20:00","22:00","0:00"];
-                        break;
-                    case "20":
-                        checkAry = ["20:00","22:00","0:00"];
-                        break;
-                    case "22":
-                        checkAry = ["22:00","0:00"];
-                        break;
-                    case "24":
-                        checkAry = ["0:00"];
-                        break;
-                }
-                var close = item.properties['終園時間'] ? item.properties['終園時間'] : item.properties['Close'];
-                if($.inArray(close, checkAry) >= 0) {
-                    return true;
-                }
-            };
-            return f(item,idx);
-        };
-
-        priNinkaFeatures = priNinkaFeatures.filter(filterfunc);
-    }
-*/
-
-    // 私立認可保育所：24時間
-    if(conditions['PriNinka24H']) {
-        filterfunc = function (item,idx) {
-            var h24 = item.properties['H24'] ? item.properties['H24'] : item.properties['H24'];
-            if(h24 === conditions['PriNinka24H']) {
-                return true;
-            }
-        };
-        priNinkaFeatures = priNinkaFeatures.filter(filterfunc);
-    }
-    // 私立認可保育所：一時
-    if(conditions['PriNinkaIchijiHoiku']) {
-        filterfunc = function (item,idx) {
-            var temp = item.properties['一時'] ? item.properties['一時'] : item.properties['Temp'];
-//            if(temp !== null) { //2017-02 kakiki-upd
-            if(temp === conditions['PriNinkaIchijiHoiku']) {
-                return true;
-            }
-        };
-        priNinkaFeatures = priNinkaFeatures.filter(filterfunc);
-    }
-    // 私立認可保育所：夜間
-    if(conditions['PriNinkaYakan']) {
-        filterfunc = function (item,idx) {
-            var night = item.properties['夜間'] ? item.properties['夜間'] : item.properties['Night'];
-//            if(night !== null) { //2017-02 kakiki-upd
-            if(night === conditions['PriNinkaYakan']) {
-                return true;
-            }
-        };
-        priNinkaFeatures = priNinkaFeatures.filter(filterfunc);
-    }
-    // 私立認可保育所：休日
-    if(conditions['PriNinkaKyujitu']) {
-        filterfunc = function (item,idx) {
-            var holiday = item.properties['休日'] ? item.properties['休日'] : item.properties['Holiday'];
-//            if(holiday !== null) { //2017-02 kakiki-upd
-            if(holiday === conditions['PriNinkaKyujitu']) {
-                return true;
-            }
-        };
-        priNinkaFeatures = priNinkaFeatures.filter(filterfunc);
-    }
-    // 私立認可保育所：延長保育
-    if(conditions['PriNinkaEncho']) {
-        filterfunc = function (item,idx) {
-            var extra = item.properties['延長保育'] ? item.properties['延長保育'] : item.properties['Extra'];
-            if(extra === conditions['PriNinkaEncho']) {
-                return true;
-            }
-        };
-        priNinkaFeatures = priNinkaFeatures.filter(filterfunc);
-    }
-    // 私立認可保育所：空きあり
-    if(conditions['PriNinkaVacancy']) {
-        filterfunc = function (item,idx) {
-            var vacancy = item.properties['Vacancy'] ? item.properties['Vacancy'] : item.properties['Vacancy'];
-//            if(vacancy !== null) { //2017-02 kakiki-upd
-            if(vacancy === conditions['PriNinkaVacancy']) {
-                return true;
-            }
-        };
-        priNinkaFeatures = priNinkaFeatures.filter(filterfunc);
-    }
-    // console.log("[after]ninkaFeatures length:", ninkaFeatures.length);
-
+    priNinkaFeatures = ifConditions(priNinkaFeatures,
+      conditions['PriNinkaOpenTime'],
+      conditions['PriNinkaCloseTime'],
+      conditions['PriNinka24H'],
+      conditions['PriNinkaIchijiHoiku'],
+      conditions['PriNinkaYakan'],
+      conditions['PriNinkaKyujitu'],
+      conditions['PriNinkaEncho'],
+      conditions['PriNinkaVacancy']
+    );
     // ----------------------------------------------------------------------
     // 認可外保育所向けフィルター
     // ----------------------------------------------------------------------
-    // 認可外：開園時間  --2017-02 kakiki 開園/終園時間の比較方法を変更
-    if(conditions['ninkagaiOpenTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                var openHour = conditions['ninkagaiOpenTime'].slice(0, conditions['ninkagaiOpenTime'].indexOf(":"));
-                var openMin = Number(conditions['ninkagaiOpenTime'].slice(-2));
-                var _open = new Date(2010, 0, 1, openHour, openMin, 0);
-                var open = item.properties['開園時間'] ? item.properties['開園時間'] : item.properties['Open'];
-                //各保育園の開園時間を変換
-                open = open.replace("：", ":");  //全角だったら半角に変更
-                var hour = open.slice(0, open.indexOf(":"));
-                var min = open.slice(-2);
-                var open_time = new Date(2010, 0, 1, hour, min, 0);
-                if(open !== "" && open_time <= _open) {
-                    return true;
-                }
-            };
-            return f(item,idx);
-        };
-        ninkagaiFeatures = ninkagaiFeatures.filter(filterfunc);
-    }
-    // 認可外：終園時間
-    if(conditions['ninkagaiCloseTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                var closeHour = conditions['ninkagaiCloseTime'].slice(0, conditions['ninkagaiCloseTime'].indexOf(":"));
-                var closeMin = Number(conditions['ninkagaiCloseTime'].slice(-2));
-                var _close = new Date(2010, 0, 1, closeHour, closeMin, 0);
-                var close = item.properties['終園時間'] ? item.properties['終園時間'] : item.properties['Close'];
-                //各保育園の終園時間を変換
-                close = close.replace("：", ":");  //全角だったら半角に変更
-                var hour = close.slice(0, close.indexOf(":"));
-                if(hour !== "" && hour <= 12) {hour = hour + 24};  //終園時間が24時過ぎの場合翌日扱い
-                var min = close.slice(-2);
-                var close_time = new Date(2010, 0, 1, hour, min, 0);
-                if(close_time >= _close) {
-                      return true;
-                  }
-            };
-            return f(item,idx);
-        };
-
-        ninkagaiFeatures = ninkagaiFeatures.filter(filterfunc);
-    }
-/*
-    // 認可外：開園時間
-    // console.log("[before]ninkagaiFeatures length:", ninkagaiFeatures.length);
-    if(conditions['ninkagaiOpenTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                var _time = conditions['ninkagaiOpenTime'];
-                var open = item.properties['開園時間'] ? item.properties['開園時間'] : item.properties['Open'];
-                if(open == _time) {
-                    return true;
-                }
-            };
-            return f(item,idx);
-        };
-        ninkagaiFeatures = ninkagaiFeatures.filter(filterfunc);
-    }
-    // 認可外：終園時間
-    if(conditions['ninkagaiCloseTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                checkAry = [];
-                switch(conditions['ninkagaiCloseTime']) {
-                    case "18":
-                        checkAry = ["18:00","19:00","19:30","19:45","20:00","20:30","22:00","23:00","3:00"];
-                        break;
-                    case "19":
-                        checkAry = ["19:00","19:30","19:45","20:00","20:30","22:00","23:00","3:00"];
-                        break;
-                    case "20":
-                        checkAry = ["20:00","20:30","22:00","23:00","3:00"];
-                        break;
-                    case "22":
-                        checkAry = ["22:00","23:00","3:00"];
-                        break;
-                    case "27":
-                        checkAry = ["3:00"];
-                        break;
-                }
-                var h24   = item.properties['H24'] ? item.properties['H24'] : item.properties['H24'];
-                var close = item.properties['終園時間'] ? item.properties['終園時間'] : item.properties['Close'];
-                if(h24 !== null || $.inArray(close, checkAry) >= 0) {
-                    return true;
-                }
-            };
-            return f(item,idx);
-        };
-        ninkagaiFeatures = ninkagaiFeatures.filter(filterfunc);
-    }
-*/
-    // 認可外保育所：24時間
-    if(conditions['ninkagai24H']) {
-        filterfunc = function (item,idx) {
-            var h24 = item.properties['H24'] ? item.properties['H24'] : item.properties['H24'];
-//            if(h24 !== null) { //2017-02 kakiki-upd
-            if(h24 === conditions['ninkagai24H']) {
-                return true;
-            }
-        };
-        ninkagaiFeatures = ninkagaiFeatures.filter(filterfunc);
-    }
-    // 認可外保育所：延長保育
-    if(conditions['ninkagaiEncho']) {
-        filterfunc = function (item,idx) {
-            var extra = item.properties['延長保育'] ? item.properties['延長保育'] : item.properties['Extra'];
-            if(extra === conditions['ninkagaiEncho']) {
-                return true;
-            }
-        };
-        ninkagaiFeatures = ninkagaiFeatures.filter(filterfunc);
-    }
-    // 認可外保育所：証明あり
-    if(conditions['ninkagaiShomei']) {
-        filterfunc = function (item,idx) {
-            var proof = item.properties['証明'] ? item.properties['証明'] : item.properties['Proof'];
-//            if(proof !== null) { //2017-02 kakiki-upd
-            if(proof === conditions['ninkagaiShomei']) {
-                return true;
-            }
-        };
-        ninkagaiFeatures = ninkagaiFeatures.filter(filterfunc);
-    }
-    // console.log("[after]ninkagaiFeatures length:", ninkagaiFeatures.length);
-
-    /* 2017-02 @kakiki ins-st */
+    ninkagaiFeatures = ifConditions(ninkagaiFeatures,
+      conditions['ninkagaiOpenTime'],
+      conditions['ninkagaiCloseTime'],
+      conditions['ninkagai24H'],
+      conditions['ninkagaiIchijiHoiku'],
+      conditions['ninkagaiYakan'],
+      conditions['ninkagaiKyujitu'],
+      conditions['ninkagaiEncho'],
+      conditions['ninkagaiVacancy']
+    );
     // ----------------------------------------------------------------------
     // 横浜保育室向けフィルター
     // ----------------------------------------------------------------------
-    // 横浜保育室：開園時間  --2017-02 kakiki 開園/終園時間の比較方法を変更
-    if(conditions['YhoikuOpenTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                var openHour = conditions['YhoikuOpenTime'].slice(0, conditions['YhoikuOpenTime'].indexOf(":"));
-                var openMin = Number(conditions['YhoikuOpenTime'].slice(-2));
-                var _open = new Date(2010, 0, 1, openHour, openMin, 0);
-                var open = item.properties['開園時間'] ? item.properties['開園時間'] : item.properties['Open'];
-                //各保育園の開園時間を変換
-                open = open.replace("：", ":");  //全角だったら半角に変更
-                var hour = open.slice(0, open.indexOf(":"));
-                var min = open.slice(-2);
-                var open_time = new Date(2010, 0, 1, hour, min, 0);
-                if(open !== "" && open_time <= _open) {
-                    return true;
-                }
-            };
-            return f(item,idx);
-        };
-        yhoikuFeatures = yhoikuFeatures.filter(filterfunc);
-    }
-    // 横浜保育室：終園時間
-    if(conditions['YhoikuCloseTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                var closeHour = conditions['YhoikuCloseTime'].slice(0, conditions['YhoikuCloseTime'].indexOf(":"));
-                var closeMin = Number(conditions['YhoikuCloseTime'].slice(-2));
-                var _close = new Date(2010, 0, 1, closeHour, closeMin, 0);
-                var close = item.properties['終園時間'] ? item.properties['終園時間'] : item.properties['Close'];
-                //各保育園の終園時間を変換
-                close = close.replace("：", ":");  //全角だったら半角に変更
-                var hour = close.slice(0, close.indexOf(":"));
-                if(hour !== "" && hour <= 12) {hour = hour + 24};  //終園時間が24時過ぎの場合翌日扱い
-                var min = close.slice(-2);
-                var close_time = new Date(2010, 0, 1, hour, min, 0);
-                if(close_time >= _close) {
-                      return true;
-                  }
-            };
-            return f(item,idx);
-        };
-
-        yhoikuFeatures = yhoikuFeatures.filter(filterfunc);
-    }
-/*
-    // 横浜保育室：開園時間
-    if(conditions['YhoikuOpenTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                var _time = conditions['YhoikuOpenTime'] + ":00";
-                var open = item.properties['開園時間'] ? item.properties['開園時間'] : item.properties['Open'];
-                if(open == _time) {
-                    return true;
-                }
-            };
-            return f(item,idx);
-        };
-        yhoikuFeatures = yhoikuFeatures.filter(filterfunc);
-    }
-    // 横浜保育室：終園時間
-    if(conditions['YhoikuCloseTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                switch(conditions['YhoikuCloseTime']) {
-                    case "18":
-                        checkAry = ["18:00","19:00","20:00","22:00","0:00"];
-                        break;
-                    case "19":
-                        checkAry = ["19:00","20:00","22:00","0:00"];
-                        break;
-                    case "20":
-                        checkAry = ["20:00","22:00","0:00"];
-                        break;
-                    case "22":
-                        checkAry = ["22:00","0:00"];
-                        break;
-                    case "24":
-                        checkAry = ["0:00"];
-                        break;
-                }
-                var close = item.properties['終園時間'] ? item.properties['終園時間'] : item.properties['Close'];
-                if($.inArray(close, checkAry) >= 0) {
-                    return true;
-                }
-            };
-            return f(item,idx);
-        };
-
-        yhoikuFeatures = yhoikuFeatures.filter(filterfunc);
-    }
-*/
-
-    // 横浜保育室：24時間
-    if(conditions['Yhoiku24H']) {
-        filterfunc = function (item,idx) {
-            var h24 = item.properties['H24'] ? item.properties['H24'] : item.properties['H24'];
-            if(h24 === conditions['Yhoiku24H']) {
-                return true;
-            }
-        };
-        yhoikuFeatures = yhoikuFeatures.filter(filterfunc);
-    }
-    // 横浜保育室：一時
-    if(conditions['YhoikuIchijiHoiku']) {
-        filterfunc = function (item,idx) {
-            var temp = item.properties['一時'] ? item.properties['一時'] : item.properties['Temp'];
-//            if(temp !== null) { //2017-02 kakiki-upd
-            if(temp === conditions['YhoikuIchijiHoiku']) {
-                return true;
-            }
-        };
-        yhoikuFeatures = yhoikuFeatures.filter(filterfunc);
-    }
-    // 横浜保育室：夜間
-    if(conditions['YhoikuYakan']) {
-        filterfunc = function (item,idx) {
-            var night = item.properties['夜間'] ? item.properties['夜間'] : item.properties['Night'];
-//            if(night !== null) { //2017-02 kakiki-upd
-            if(night === conditions['YhoikuYakan']) {
-                return true;
-            }
-        };
-        yhoikuFeatures = yhoikuFeatures.filter(filterfunc);
-    }
-    // 横浜保育室：休日
-    if(conditions['YhoikuKyujitu']) {
-        filterfunc = function (item,idx) {
-            var holiday = item.properties['休日'] ? item.properties['休日'] : item.properties['Holiday'];
-//            if(holiday !== null) { //2017-02 kakiki-upd
-            if(holiday === conditions['YhoikuKyujitu']) {
-                return true;
-            }
-        };
-        yhoikuFeatures = yhoikuFeatures.filter(filterfunc);
-    }
-    // 横浜保育室：延長保育
-    if(conditions['YhoikuEncho']) {
-        filterfunc = function (item,idx) {
-            var extra = item.properties['延長保育'] ? item.properties['延長保育'] : item.properties['Extra'];
-            if(extra === conditions['YhoikuEncho']) {
-                return true;
-            }
-        };
-        yhoikuFeatures = yhoikuFeatures.filter(filterfunc);
-    }
-    // 横浜保育室：空きあり
-    if(conditions['YhoikuVacancy']) {
-        filterfunc = function (item,idx) {
-            var vacancy = item.properties['Vacancy'] ? item.properties['Vacancy'] : item.properties['Vacancy'];
-//            if(vacancy !== null) { //2017-02 kakiki-upd
-            if(vacancy === conditions['YhoikuVacancy']) {
-                return true;
-            }
-        };
-        yhoikuFeatures = yhoikuFeatures.filter(filterfunc);
-    }
-    /* 2017-02 @kakiki ins-end */
-
+    yhoikuFeatures = ifConditions(yhoikuFeatures,
+      conditions['YhoikuOpenTime'],
+      conditions['YhoikuCloseTime'],
+      conditions['Yhoiku24H'],
+      conditions['YhoikuIchijiHoiku'],
+      conditions['YhoikuYakan'],
+      conditions['YhoikuKyujitu'],
+      conditions['YhoikuEncho'],
+      conditions['YhoikuVacancy']
+    );
     // ----------------------------------------------------------------------
     // 幼稚園向けフィルター
     // ----------------------------------------------------------------------
-    // ----------------------------------------------------------------------
-    // 幼稚園：開園時間
-    if(conditions['KindergartenOpenTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                var openHour = conditions['KindergartenOpenTime'].slice(0, conditions['KindergartenOpenTime'].indexOf(":"));
-                var openMin = Number(conditions['KindergartenOpenTime'].slice(-2));
-                var _open = new Date(2010, 0, 1, openHour, openMin, 0);
-                var open = item.properties['開園時間'] ? item.properties['開園時間'] : item.properties['Open'];
-                //各保育園の開園時間を変換
-                open = open.replace("：", ":");  //全角だったら半角に変更
-                var hour = open.slice(0, open.indexOf(":"));
-                var min = open.slice(-2);
-                var open_time = new Date(2010, 0, 1, hour, min, 0);
-                if(open !== "" && open_time <= _open) {
-                    return true;
-                }
-            };
-            return f(item,idx);
-        };
-        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
-    }
-    // 幼稚園：終園時間
-    if(conditions['KindergartenCloseTime']) {
-        filterfunc = function (item, idx) {
-            f = function (item,idx) {
-                var closeHour = conditions['KindergartenCloseTime'].slice(0, conditions['KindergartenCloseTime'].indexOf(":"));
-                var closeMin = Number(conditions['KindergartenCloseTime'].slice(-2));
-                var _close = new Date(2010, 0, 1, closeHour, closeMin, 0);
-                var close = item.properties['終園時間'] ? item.properties['終園時間'] : item.properties['Close'];
-                //各保育園の終園時間を変換
-                close = close.replace("：", ":");  //全角だったら半角に変更
-                var hour = close.slice(0, close.indexOf(":"));
-                if(hour !== "" && hour <= 12) {hour = hour + 24};  //終園時間が24時過ぎの場合翌日扱い
-                var min = close.slice(-2);
-                var close_time = new Date(2010, 0, 1, hour, min, 0);
-                if(close_time >= _close) {
-                      return true;
-                  }
-            };
-            return f(item,idx);
-        };
-
-        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
-    }
-    // 幼稚園：24時間
-    if(conditions['Kindergarten24H']) {
-        filterfunc = function (item,idx) {
-            var h24 = item.properties['H24'] ? item.properties['H24'] : item.properties['H24'];
-            if(h24 === conditions['Kindergarten24H']) {
-                return true;
-            }
-        };
-        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
-    }
-    // 幼稚園：一時
-    if(conditions['KindergartenIchijiHoiku']) {
-        filterfunc = function (item,idx) {
-            var temp = item.properties['一時'] ? item.properties['一時'] : item.properties['Temp'];
-//            if(temp !== null) { //2017-02 kakiki-upd
-            if(temp === conditions['KindergartenIchijiHoiku']) {
-                return true;
-            }
-        };
-        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
-    }
-    // 幼稚園：夜間
-    if(conditions['KindergartenYakan']) {
-        filterfunc = function (item,idx) {
-            var night = item.properties['夜間'] ? item.properties['夜間'] : item.properties['Night'];
-//            if(night !== null) { //2017-02 kakiki-upd
-            if(night === conditions['KindergartenYakan']) {
-                return true;
-            }
-        };
-        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
-    }
-    // 幼稚園：休日
-    if(conditions['KindergartenKyujitu']) {
-        filterfunc = function (item,idx) {
-            var holiday = item.properties['休日'] ? item.properties['休日'] : item.properties['Holiday'];
-//            if(holiday !== null) { //2017-02 kakiki-upd
-            if(holiday === conditions['KindergartenKyujitu']) {
-                return true;
-            }
-        };
-        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
-    }
-    // 幼稚園：延長保育
-    if(conditions['KindergartenEncho']) {
-        filterfunc = function (item,idx) {
-            var extra = item.properties['延長保育'] ? item.properties['延長保育'] : item.properties['Extra'];
-            if(extra === conditions['KindergartenEncho']) {
-                return true;
-            }
-        };
-        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
-    }
-    // 幼稚園：空きあり
-    if(conditions['KindergartenVacancy']) {
-        filterfunc = function (item,idx) {
-            var vacancy = item.properties['Vacancy'] ? item.properties['Vacancy'] : item.properties['Vacancy'];
-//            if(vacancy !== null) { //2017-02 kakiki-upd
-            if(vacancy === conditions['KindergartenVacancy']) {
-                return true;
-            }
-        };
-        kindergartenFeatures = kindergartenFeatures.filter(filterfunc);
-    }
-
+    kindergartenFeatures = ifConditions(kindergartenFeatures,
+      conditions['KindergartenOpenTime'],
+      conditions['KindergartenCloseTime'],
+      conditions['Kindergarten24H'],
+      conditions['KindergartenIchijiHoiku'],
+      conditions['KindergartenYakan'],
+      conditions['KindergartenKyujitu'],
+      conditions['KindergartenEncho'],
+      conditions['KindergartenVacancy']
+    );
 
     // 戻り値の作成
     var features = [];
-    //Array.prototype.push.apply(features, ninkaFeatures);
     Array.prototype.push.apply(features, priNinkaFeatures);
     Array.prototype.push.apply(features, pubNinkaFeatures);
     Array.prototype.push.apply(features, ninkagaiFeatures);
     Array.prototype.push.apply(features, kindergartenFeatures);
-    Array.prototype.push.apply(features, yhoikuFeatures);   //2017-02 kakiki-ins
-    // console.log("getFilteredFeaturesGeoJson: return value: ", features.length);
+    Array.prototype.push.apply(features, yhoikuFeatures);
     newGeoJson.features = features;
     return newGeoJson;
 };
