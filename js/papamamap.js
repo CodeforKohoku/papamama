@@ -400,9 +400,9 @@ Papamamap.prototype.getPopupContent = function(feature)
     var holiday = feature.get('休日') ? feature.get('休日') : feature.get('Holiday');
     var night   = feature.get('夜間') ? feature.get('夜間') : feature.get('Night');
     var h24     = feature.get('H24') ? feature.get('H24') : feature.get('H24');
-    var extra     = feature.get('延長保育') ? feature.get('延長保育') : feature.get('Extra');
+    var extra   = feature.get('延長保育') ? feature.get('延長保育') : feature.get('Extra');
 
-    if( !isUndefined(temp) || !isUndefined(holiday) || !isUndefined(night) || !isUndefined(h24)) {
+    if( !isUndefined(temp) || !isUndefined(holiday) || !isUndefined(night) || !isUndefined(h24) || !isUndefined(extra)) {
         content += '<tr>';
         content += '<th></th>';
         content += '<td>';
