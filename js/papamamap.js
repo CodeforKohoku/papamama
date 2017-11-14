@@ -400,6 +400,7 @@ Papamamap.prototype.getPopupContent = function(feature)
     var holiday = feature.get('休日') ? feature.get('休日') : feature.get('Holiday');
     var night   = feature.get('夜間') ? feature.get('夜間') : feature.get('Night');
     var h24     = feature.get('H24') ? feature.get('H24') : feature.get('H24');
+    var extra     = feature.get('延長保育') ? feature.get('延長保育') : feature.get('Extra');
 
     if( !isUndefined(temp) || !isUndefined(holiday) || !isUndefined(night) || !isUndefined(h24)) {
         content += '<tr>';
@@ -416,6 +417,9 @@ Papamamap.prototype.getPopupContent = function(feature)
         }
         if (formatNull(h24) !== null) {
             content += '24時間 ';
+        }
+        if (formatNull(extra) !== null) {
+            content += '延長保育 ';
         }
         content += '</td>';
         content += '</tr>';
@@ -457,6 +461,13 @@ Papamamap.prototype.getPopupContent = function(feature)
         content += '<tr>';
         content += '<th>TEL</th>';
         content += '<td>' + tel + '</td>';
+        content += '</tr>';
+    }
+    var fax = feature.get('FAX') ? feature.get('FAX') : feature.get('FAX');
+    if (!isUndefined(fax)) {
+        content += '<tr>';
+        content += '<th>FAX</th>';
+        content += '<td>' + fax + '</td>';
         content += '</tr>';
     }
     var add1 = feature.get('住所１') ? feature.get('住所１') : feature.get('Add1');

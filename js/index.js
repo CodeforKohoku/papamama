@@ -332,6 +332,7 @@ $('#mainPage').on('pageshow', function() {
 
     // 検索フィルターを有効にする
 	$('#filterApply').click(function(evt){
+
 		// 条件作成処理
 		conditions = [];
 		//ninka = ninkagai = yhoiku = kindergarten = jigyosho = false;		//2017-02 @kakiki upd
@@ -347,6 +348,10 @@ $('#mainPage').on('pageshow', function() {
 			conditions['PubNinkaCloseTime'] = $('#PubNinkaCloseTime option:selected').val();
 			pubNinka = true;
 		}
+		if($('#PubNinka24H').prop('checked')) {
+			conditions['PubNinka24H'] = "Y"; //1;
+			pubNinka = true;
+		}
 		if($('#PubNinkaIchijiHoiku').prop('checked')) {
 			conditions['PubNinkaIchijiHoiku'] = "Y"; //1;
 			pubNinka = true;
@@ -357,6 +362,10 @@ $('#mainPage').on('pageshow', function() {
 		}
 		if($('#PubNinkaKyujitu').prop('checked')) {
 			conditions['PubNinkaKyujitu'] = "Y"; //1;
+			pubNinka = true;
+		}
+		if($('#PubNinkaEncho').prop('checked')) {
+			conditions['PubNinkaEncho'] = "Y"; //1;
 			pubNinka = true;
 		}
 		if($('#PubNinkaVacancy').prop('checked')) {
@@ -373,6 +382,10 @@ $('#mainPage').on('pageshow', function() {
 			conditions['PriNinkaCloseTime'] = $('#PriNinkaCloseTime option:selected').val();
 			priNinka = true;
 		}
+		if($('#PriNinka24H').prop('checked')) {
+			conditions['PriNinka24H'] = "Y"; //1;
+			priNinka = true;
+		}
 		if($('#PriNinkaIchijiHoiku').prop('checked')) {
 			conditions['PriNinkaIchijiHoiku'] = "Y"; //1;
 			priNinka = true;
@@ -383,6 +396,10 @@ $('#mainPage').on('pageshow', function() {
 		}
 		if($('#PriNinkaKyujitu').prop('checked')) {
 			conditions['PriNinkaKyujitu'] = "Y"; //1;
+			priNinka = true;
+		}
+		if($('#PriNinkaEncho').prop('checked')) {
+			conditions['PriNinkaEncho'] = "Y"; //1;
 			priNinka = true;
 		}
 		if($('#PriNinkaVacancy').prop('checked')) {
@@ -404,6 +421,10 @@ $('#mainPage').on('pageshow', function() {
 			conditions['ninkagai24H'] = "Y"; //1;
 			ninkagai = true;
 		}
+		if($('#ninkagaiEncho').prop('checked')) {
+			conditions['ninkagaiEncho'] = "Y"; //1;
+			ninkagai = true;
+		}
 		if($('#ninkagaiShomei').prop('checked')) {
 			conditions['ninkagaiShomei'] = "Y"; //1;
 			ninkagai = true;
@@ -418,6 +439,10 @@ $('#mainPage').on('pageshow', function() {
 			conditions['YhoikuCloseTime'] = $('#YhoikuCloseTime option:selected').val();
 			yhoiku = true;
 		}
+		if($('#Yhoiku24H').prop('checked')) {
+			conditions['Yhoiku24H'] = "Y"; //1;
+			yhoiku = true;
+		}
 		if($('#YhoikuIchijiHoiku').prop('checked')) {
 			conditions['YhoikuIchijiHoiku'] = "Y"; //1;
 			yhoiku = true;
@@ -430,6 +455,10 @@ $('#mainPage').on('pageshow', function() {
 			conditions['YhoikuKyujitu'] = "Y"; //1;
 			yhoiku = true;
 		}
+		if($('#YhoikuEncho').prop('checked')) {
+			conditions['YhoikuEncho'] = "Y"; //1;
+			yhoiku = true;
+		}
 		if($('#YhoikuVacancy').prop('checked')) {
 			conditions['YhoikuVacancy'] = "Y"; //1;
 			yhoiku = true;
@@ -438,6 +467,39 @@ $('#mainPage').on('pageshow', function() {
 		// 小規模・事業所内保育事業：未対応
 
 		// 幼稚園
+		if($('#KindergartenOpenTime option:selected').val() !== "") {
+			conditions['KindergartenOpenTime'] = $('#KindergartenOpenTime option:selected').val();
+			kindergarten = true;
+		}
+		if($('#KindergartenCloseTime option:selected').val() !== "") {
+			conditions['KindergartenCloseTime'] = $('#KindergartenCloseTime option:selected').val();
+			kindergarten = true;
+		}
+		if($('#Kindergarten24H').prop('checked')) {
+			conditions['Kindergarten24H'] = "Y"; //1;
+			kindergarten = true;
+		}
+		if($('#KindergartenIchijiHoiku').prop('checked')) {
+			conditions['KindergartenIchijiHoiku'] = "Y"; //1;
+			kindergarten = true;
+		}
+		if($('#KindergartenYakan').prop('checked')) {
+			conditions['KindergartenYakan'] = "Y"; //1;
+			kindergarten = true;
+		}
+		if($('#KindergartenKyujitu').prop('checked')) {
+			conditions['KindergartenKyujitu'] = "Y"; //1;
+			kindergarten = true;
+		}
+		if($('#KindergartenEncho').prop('checked')) {
+			conditions['KindergartenEncho'] = "Y"; //1;
+			kindergarten = true;
+		}
+		if($('#KindergartenVacancy').prop('checked')) {
+			conditions['KindergartenVacancy'] = "Y"; //1;
+			kindergarten = true;
+		}
+
 
 		// フィルター適用時
 		if(Object.keys(conditions).length > 0) {
