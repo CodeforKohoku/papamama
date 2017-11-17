@@ -361,7 +361,7 @@ $('#mainPage').on('pageshow', function() {
 					conditions.push(obj);
 			}
 	  });
-
+console.log("ok");
 		// フィルター適用時
 		if(Object.keys(conditions).length > 0) {
 			conditions = Object.values(conditions).reduce(function(p,c) {

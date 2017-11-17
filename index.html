@@ -99,7 +99,7 @@
             <form>
                 <div style="padding:10px 20px;">
                     <h3>保育施設 絞り込み</h3>
-                    <!-- 2017-02 @kakiki upd&ins-st -->
+
                     <legend>公立認可保育園</legend>
                     <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
                         <label for="pubNinkaOpenTime" class="select">開園</label>
@@ -108,10 +108,6 @@
                         <select id="pubNinkaCloseTime" class="filtersb"></select>
                         <label for="pubNinka24H">24時間</label>
                         <input type="checkbox" id="pubNinka24H" class="filtercb">
-                    <!--
-                    </fieldset>
-                    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-                    -->
                         <label for="pubNinkaIchijiHoiku">一時保育</label>
                         <input type="checkbox" id="pubNinkaIchijiHoiku" class="filtercb">
                         <label for="pubNinkaYakan">夜間</label>
@@ -134,10 +130,6 @@
                         <select id="priNinkaCloseTime" class="filtersb"></select>
                         <label for="priNinka24H">24時間</label>
                         <input type="checkbox" id="priNinka24H" class="filtercb">
-                    <!--
-                    </fieldset>
-                    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-                    -->
                         <label for="priNinkaIchijiHoiku">一時保育</label>
                         <input type="checkbox" id="priNinkaIchijiHoiku" class="filtercb">
                         <label for="priNinkaYakan">夜間</label>
@@ -160,10 +152,6 @@
                         <select id="yhoikuCloseTime" class="filtersb"></select>
                         <label for="yhoiku24H">24時間</label>
                         <input type="checkbox" id="yhoiku24H" class="filtercb">
-                    <!--
-                    </fieldset>
-                    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-                    -->
                         <label for="yhoikuIchijiHoiku">一時保育</label>
                         <input type="checkbox" id="yhoikuIchijiHoiku" class="filtercb">
                         <label for="yhoikuYakan">夜間</label>
@@ -177,7 +165,6 @@
                         <label for="yhoikuVacancy">空きあり（試用版。最新の空き状況ではありません）</label>
                         <input type="checkbox" id="yhoikuVacancy" class="filtercb">
                     </fieldset>
-                    <!-- 2017-02-25 @kakiki upd&ins-end -->
 
                     <legend>認可外保育園</legend>
                     <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
@@ -187,8 +174,18 @@
                         <select id="ninkagaiCloseTime" class="filtersb"></select>
                         <label for="ninkagai24H">24時間</label>
                         <input type="checkbox" id="ninkagai24H" class="filtercb">
+                        <label for="ninkagaiIchijiHoiku">一時保育</label>
+                        <input type="checkbox" id="ninkagaiIchijiHoiku" class="filtercb">
+                        <label for="ninkagaiYakan">夜間</label>
+                        <input type="checkbox" id="ninkagaiYakan" class="filtercb">
+                        <label for="ninkagaiKyujitu">休日</label>
+                        <input type="checkbox" id="ninkagaiKyujitu" class="filtercb">
                         <label for="ninkagaiEncho">延長保育</label>
                         <input type="checkbox" id="ninkagaiEncho" class="filtercb">
+                    </fieldset>
+                    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+                        <label for="ninkagaiVacancy">空きあり（試用版。最新の空き状況ではありません）</label>
+                        <input type="checkbox" id="ninkagaiVacancy" class="filtercb">
                     </fieldset>
                     <!-- //2017-02 kakiki-del
                     <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
@@ -217,6 +214,7 @@
                         <label for="kindergartenVacancy">空きあり（試用版。最新の空き状況ではありません）</label>
                         <input type="checkbox" id="kindergartenVacancy" class="filtercb">
                     </fieldset>
+                    
                     <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
                         <a href="#" data-rel="back" id="filterApply" class="ui-btn ui-corner-all ui-btn-a ui-btn-icon-left ui-icon-check">条件適用</a>
                         <a href="#" id="filterReset" class="ui-btn ui-corner-all ui-btn-a ui-btn-icon-left ui-icon-delete">リセット</a>
