@@ -361,7 +361,7 @@ $('#mainPage').on('pageshow', function() {
 					conditions.push(obj);
 			}
 	  });
-console.log("ok");
+
 		// フィルター適用時
 		if(Object.keys(conditions).length > 0) {
 			conditions = Object.values(conditions).reduce(function(p,c) {
@@ -401,7 +401,6 @@ console.log("ok");
 		$('#btnFilter').css('background-color', '#f6f6f6');
 
 		// レイヤー表示状態によって施設の表示を切り替える
-		//updateLayerStatus({ninka: true, ninkagai: true, yhoiku: true, kindergarten: true, jigyosho: true});  //2017-02 @kakiki upd
 		updateLayerStatus({pubNinka: true, priNinka: true, ninkagai: true, yhoiku: true, kindergarten: true, jigyosho: true});
 	});
 
@@ -535,6 +534,7 @@ function openTime()
 	document.getElementById("yhoikuOpenTime").innerHTML = options;
 	document.getElementById("ninkagaiOpenTime").innerHTML = options;
 	document.getElementById("kindergartenOpenTime").innerHTML = options;
+	document.getElementById("jigyoshoOpenTime").innerHTML = options;
 	return;
 }
 
@@ -557,6 +557,7 @@ function closeTime()
 	document.getElementById("yhoikuCloseTime").innerHTML = options;
 	document.getElementById("ninkagaiCloseTime").innerHTML = options;
 	document.getElementById("kindergartenCloseTime").innerHTML = options;
+	document.getElementById("jigyoshoCloseTime").innerHTML = options;
 	return;
 }
 openTime();

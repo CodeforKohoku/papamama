@@ -49,6 +49,10 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
     var kindergartenFeatures = [];
     getFilteredType(kindergartenFeatures, "幼稚園")
 
+    // 小規模・事業所内保育事業の検索元データを取得
+    var jigyoshoFeatures = [];
+    getFilteredType(jigyoshoFeatures, "小規模・事業所内保育事業")
+
 
     // 開園時間でフィルターする関数
     var ifOpenTime = function (typeFeatures,conditionVal) {
@@ -361,13 +365,50 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
         checkObj['kindergarten'] = true;
     }
 
+    // ----------------------------------------------------------------------
+    // 小規模・事業所内保育事業向けフィルター
+    // ----------------------------------------------------------------------
+    if (conditions['jigyoshoOpenTime']) {
+        jigyoshoFeatures = ifOpenTime(jigyoshoFeatures, conditions['jigyoshoOpenTime']);
+        checkObj['jigyosho'] = true;
+    }
+    if (conditions['jigyoshoCloseTime']) {
+        jigyoshoFeatures = ifCloseTime(jigyoshoFeatures, conditions['jigyoshoCloseTime']);
+        checkObj['jigyosho'] = true;
+    }
+    if (conditions['jigyosho24H']) {
+        jigyoshoFeatures = if24H(jigyoshoFeatures, conditions['jigyosho24H']);
+        checkObj['jigyosho'] = true;
+    }
+    if (conditions['jigyoshoIchijiHoiku']) {
+        jigyoshoFeatures = ifIchijiHoiku(jigyoshoFeatures, conditions['jigyoshoIchijiHoiku']);
+        checkObj['jigyosho'] = true;
+    }
+    if (conditions['jigyoshoYakan']) {
+        jigyoshoFeatures = ifYakan(jigyoshoFeatures, conditions['jigyoshoYakan']);
+        checkObj['jigyosho'] = true;
+    }
+    if (conditions['jigyoshoKyujitu']) {
+        jigyoshoFeatures = ifKyujitu(jigyoshoFeatures, conditions['jigyoshoKyujitu']);
+        checkObj['jigyosho'] = true;
+    }
+    if (conditions['jigyoshoEncho']) {
+        jigyoshoFeatures = ifEncho(jigyoshoFeatures, conditions['jigyoshoEncho']);
+        checkObj['jigyosho'] = true;
+    }
+    if (conditions['jigyoshoVacancy']) {
+        jigyoshoFeatures = ifVacancy(jigyoshoFeatures, conditions['jigyoshoVacancy']);
+        checkObj['jigyosho'] = true;
+    }
+
     // 戻り値の作成
     var features = [];
     Array.prototype.push.apply(features, pubNinkaFeatures);
     Array.prototype.push.apply(features, priNinkaFeatures);
     Array.prototype.push.apply(features, ninkagaiFeatures);
-    Array.prototype.push.apply(features, kindergartenFeatures);
     Array.prototype.push.apply(features, yhoikuFeatures);
+    Array.prototype.push.apply(features, kindergartenFeatures);
+    Array.prototype.push.apply(features, jigyoshoFeatures);
     newGeoJson.features = features;
     return newGeoJson;
 };
