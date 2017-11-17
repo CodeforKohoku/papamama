@@ -6,9 +6,10 @@ window.FacilityFilter = function () {
  *
  * @param  {[type]} conditions        [description]
  * @param  {[type]} nurseryFacilities [description]
+ * @param  {[type]} checkObj [description]
  * @return {[type]}                   [description]
  */
-FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurseryFacilities)
+FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurseryFacilities, checkObj)
 {
   	'use strict';
 
@@ -19,6 +20,7 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
         "features":[]
     };
 
+    // 保育施設名称ごとにGeoJsonのデータを取得する
     var getFilteredType = function (typeFeatures, typeName) {
       var _features = nurseryFacilities.features.filter(function (item,idx) {
               var type = item.properties['種別'] ? item.properties['種別'] : item.properties['Type'];
@@ -47,6 +49,8 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
     var kindergartenFeatures = [];
     getFilteredType(kindergartenFeatures, "幼稚園")
 
+
+    // 開園時間でフィルターする関数
     var ifOpenTime = function (typeFeatures,conditionVal) {
       var filterfunc = function (item, idx) {
           var f = function (item,idx) {
@@ -68,6 +72,7 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
       return typeFeatures.filter(filterfunc);
     };
 
+    // 終園時間でフィルターする関数
     var ifCloseTime = function (typeFeatures,conditionVal) {
       var filterfunc = function (item, idx) {
           var f = function (item,idx) {
@@ -90,6 +95,7 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
       return typeFeatures.filter(filterfunc);
     };
 
+    // 24時間対応でフィルターする関数
     var if24H = function (typeFeatures,conditionVal) {
       var filterfunc = function (item, idx) {
           var f = function (item,idx) {
@@ -103,6 +109,7 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
       return typeFeatures.filter(filterfunc);
     };
 
+    // 一時保育でフィルターする関数
     var ifIchijiHoiku = function (typeFeatures,conditionVal) {
       var filterfunc = function (item, idx) {
           var f = function (item,idx) {
@@ -113,9 +120,10 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
           };
           return f(item,idx);
       };
-      typeFeatures = typeFeatures.filter(filterfunc);
+      return typeFeatures.filter(filterfunc);
     };
 
+    // 夜間対応でフィルターする関数
     var ifYakan = function (typeFeatures,conditionVal) {
       var filterfunc = function (item, idx) {
           var f = function (item,idx) {
@@ -126,9 +134,10 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
           };
           return f(item,idx);
       };
-      typeFeatures = typeFeatures.filter(filterfunc);
+      return typeFeatures.filter(filterfunc);
     };
 
+    // 休日対応でフィルターする関数
     var ifKyujitu = function (typeFeatures,conditionVal) {
       var filterfunc = function (item, idx) {
           var f = function (item,idx) {
@@ -142,6 +151,7 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
       return typeFeatures.filter(filterfunc);
     };
 
+    // 延長保育でフィルターする関数
     var ifEncho = function (typeFeatures,conditionVal) {
       var filterfunc = function (item, idx) {
           var f = function (item,idx) {
@@ -155,6 +165,7 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
       return typeFeatures.filter(filterfunc);
     };
 
+    // 欠員情報でフィルターする関数
     var ifVacancy = function (typeFeatures,conditionVal) {
       var filterfunc = function (item, idx) {
           var f = function (item,idx) {
@@ -168,177 +179,186 @@ FacilityFilter.prototype.getFilteredFeaturesGeoJson = function (conditions, nurs
       return typeFeatures.filter(filterfunc);
     };
 
-    var pubNinka, priNinka, ninkagai, yhoiku, kindergarten, jigyosho;
-    pubNinka = priNinka = ninkagai = yhoiku = kindergarten = jigyosho = false;
 
-    if (conditions.pubNinkaOpenTime) {
-        pubNinkaFeatures = ifOpenTime(pubNinkaFeatures, conditions.pubNinkaOpenTime);
-        pubNinka = true;
+    // ----------------------------------------------------------------------
+    // 公立認可保育所向けフィルター
+    // ----------------------------------------------------------------------
+    if (conditions['pubNinkaOpenTime']) {
+        pubNinkaFeatures = ifOpenTime(pubNinkaFeatures, conditions['pubNinkaOpenTime']);
+        checkObj['pubNinka'] = true;
     }
-    if (conditions.pubNinkaCloseTime) {
-        pubNinkaFeatures = ifCloseTime(pubNinkaFeatures, conditions.pubNinkaCloseTime);
-        pubNinka = true;
+    if (conditions['pubNinkaCloseTime']) {
+        pubNinkaFeatures = ifCloseTime(pubNinkaFeatures, conditions['pubNinkaCloseTime']);
+        checkObj['pubNinka'] = true;
     }
-    if (conditions.pubNinka24H) {
-        pubNinkaFeatures = if24H(pubNinkaFeatures, conditions.pubNinka24H);
-        pubNinka = true;
+    if (conditions['pubNinka24H']) {
+        pubNinkaFeatures = if24H(pubNinkaFeatures, conditions['pubNinka24H']);
+        checkObj['pubNinka'] = true;
     }
-    if (conditions.pubNinkaIchijiHoiku) {
-        pubNinkaFeatures = ifIchijiHoiku(pubNinkaFeatures, conditions.pubNinkaIchijiHoiku);
-        pubNinka = true;
+    if (conditions['pubNinkaIchijiHoiku']) {
+        pubNinkaFeatures = ifIchijiHoiku(pubNinkaFeatures, conditions['pubNinkaIchijiHoiku']);
+        checkObj['pubNinka'] = true;
     }
-    if (conditions.pubNinkaYakan) {
-        pubNinkaFeatures = ifYakan(pubNinkaFeatures, conditions.pubNinkaYakan);
-        pubNinka = true;
+    if (conditions['pubNinkaYakan']) {
+        pubNinkaFeatures = ifYakan(pubNinkaFeatures, conditions['pubNinkaYakan']);
+        checkObj['pubNinka'] = true;
     }
-    if (conditions.pubNinkaKyujitu) {
-        pubNinkaFeatures = ifKyujitu(pubNinkaFeatures, conditions.pubNinkaKyujitu);
-        pubNinka = true;
+    if (conditions['pubNinkaKyujitu']) {
+        pubNinkaFeatures = ifKyujitu(pubNinkaFeatures, conditions['pubNinkaKyujitu']);
+        checkObj['pubNinka'] = true;
     }
-    if (conditions.pubNinkaEncho) {
-        pubNinkaFeatures = ifEncho(pubNinkaFeatures, conditions.pubNinkaEncho);
-        pubNinka = true;
+    if (conditions['pubNinkaEncho']) {
+        pubNinkaFeatures = ifEncho(pubNinkaFeatures, conditions['pubNinkaEncho']);
+        checkObj['pubNinka'] = true;
     }
-    if (conditions.pubNinkaVacancy) {
-        pubNinkaFeatures = ifVacancy(pubNinkaFeatures, conditions.pubNinkaVacancy);
-        pubNinka = true;
-    }
-
-
-    if (conditions.priNinkaOpenTime) {
-        priNinkaFeatures = ifOpenTime(priNinkaFeatures, conditions.priNinkaOpenTime);
-        priNinka = true;
-    }
-    if (conditions.priNinkaCloseTime) {
-        priNinkaFeatures = ifCloseTime(priNinkaFeatures, conditions.priNinkaCloseTime);
-        priNinka = true;
-    }
-    if (conditions.priNinka24H) {
-        priNinkaFeatures = if24H(priNinkaFeatures, conditions.priNinka24H);
-        priNinka = true;
-    }
-    if (conditions.priNinkaIchijiHoiku) {
-        priNinkaFeatures = ifIchijiHoiku(priNinkaFeatures, conditions.priNinkaIchijiHoiku);
-        priNinka = true;
-    }
-    if (conditions.priNinkaYakan) {
-        priNinkaFeatures = ifYakan(priNinkaFeatures, conditions.priNinkaYakan);
-        priNinka = true;
-    }
-    if (conditions.priNinkaKyujitu) {
-        priNinkaFeatures = ifKyujitu(priNinkaFeatures, conditions.priNinkaKyujitu);
-        priNinka = true;
-    }
-    if (conditions.priNinkaEncho) {
-        priNinkaFeatures = ifEncho(priNinkaFeatures, conditions.priNinkaEncho);
-        priNinka = true;
-    }
-    if (conditions.priNinkaVacancy) {
-        priNinkaFeatures = ifVacancy(priNinkaFeatures, conditions.priNinkaVacancy);
-        priNinka = true;
+    if (conditions['pubNinkaVacancy']) {
+        pubNinkaFeatures = ifVacancy(pubNinkaFeatures, conditions['pubNinkaVacancy']);
+        checkObj['pubNinka'] = true;
     }
 
-
-
-    if (conditions.ninkagaiOpenTime) {
-        ninkagaiFeatures = ifOpenTime(ninkagaiFeatures, conditions.ninkagaiOpenTime);
-        ninkagai = true;
+    // ----------------------------------------------------------------------
+    // 私立認可保育所向けフィルター
+    // ----------------------------------------------------------------------
+    if (conditions['priNinkaOpenTime']) {
+        priNinkaFeatures = ifOpenTime(priNinkaFeatures, conditions['priNinkaOpenTime']);
+        checkObj['priNinka']= true;
     }
-    if (conditions.ninkagaiCloseTime) {
-        ninkagaiFeatures = ifCloseTime(ninkagaiFeatures, conditions.ninkagaiCloseTime);
-        ninkagai = true;
+    if (conditions['priNinkaCloseTime']) {
+        priNinkaFeatures = ifCloseTime(priNinkaFeatures, conditions['priNinkaCloseTime']);
+        checkObj['priNinka']= true;
     }
-    if (conditions.ninkagai24H) {
-        ninkagaiFeatures = if24H(ninkagaiFeatures, conditions.ninkagai24H);
-        ninkagai = true;
+    if (conditions['priNinka24H']) {
+        priNinkaFeatures = if24H(priNinkaFeatures, conditions['priNinka24H']);
+        checkObj['priNinka']= true;
     }
-    if (conditions.ninkagaiIchijiHoiku) {
-        ninkagaiFeatures = ifIchijiHoiku(ninkagaiFeatures, conditions.ninkagaiIchijiHoiku);
-        ninkagai = true;
+    if (conditions['priNinkaIchijiHoiku']) {
+        priNinkaFeatures = ifIchijiHoiku(priNinkaFeatures, conditions['priNinkaIchijiHoiku']);
+        checkObj['priNinka']= true;
     }
-    if (conditions.ninkagaiYakan) {
-        ninkagaiFeatures = ifYakan(ninkagaiFeatures, conditions.ninkagaiYakan);
-        ninkagai = true;
+    if (conditions['priNinkaYakan']) {
+        priNinkaFeatures = ifYakan(priNinkaFeatures, conditions['priNinkaYakan']);
+        checkObj['priNinka']= true;
     }
-    if (conditions.ninkagaiKyujitu) {
-        ninkagaiFeatures = ifKyujitu(ninkagaiFeatures, conditions.ninkagaiKyujitu);
-        ninkagai = true;
+    if (conditions['priNinkaKyujitu']) {
+        priNinkaFeatures = ifKyujitu(priNinkaFeatures, conditions['priNinkaKyujitu']);
+        checkObj['priNinka']= true;
     }
-    if (conditions.ninkagaiEncho) {
-        ninkagaiFeatures = ifEncho(ninkagaiFeatures, conditions.ninkagaiEncho);
-        ninkagai = true;
+    if (conditions['priNinkaEncho']) {
+        priNinkaFeatures = ifEncho(priNinkaFeatures, conditions['priNinkaEncho']);
+        checkObj['priNinka']= true;
     }
-    if (conditions.ninkagaiVacancy) {
-        ninkagaiFeatures = ifVacancy(ninkagaiFeatures, conditions.ninkagaiVacancy);
-        ninkagai = true;
+    if (conditions['priNinkaVacancy']) {
+        priNinkaFeatures = ifVacancy(priNinkaFeatures, conditions['priNinkaVacancy']);
+        checkObj['priNinka']= true;
     }
 
 
-    if (conditions.yhoikuOpenTime) {
-        yhoikuFeatures = ifOpenTime(yhoikuFeatures, conditions.yhoikuOpenTime);
-        yhoiku = true;
+    // ----------------------------------------------------------------------
+    // 認可外保育所向けフィルター
+    // ----------------------------------------------------------------------
+    if (conditions['ninkagaiOpenTime']) {
+        ninkagaiFeatures = ifOpenTime(ninkagaiFeatures, conditions['ninkagaiOpenTime']);
+        checkObj['ninkagai'] = true;
     }
-    if (conditions.yhoikuCloseTime) {
-        yhoikuFeatures = ifCloseTime(yhoikuFeatures, conditions.yhoikuCloseTime);
-        yhoiku = true;
+    if (conditions['ninkagaiCloseTime']) {
+        ninkagaiFeatures = ifCloseTime(ninkagaiFeatures, conditions['ninkagaiCloseTime']);
+        checkObj['ninkagai'] = true;
     }
-    if (conditions.yhoiku24H) {
-        yhoikuFeatures = if24H(yhoikuFeatures, conditions.yhoiku24H);
-        yhoiku = true;
+    if (conditions['ninkagai24H']) {
+        ninkagaiFeatures = if24H(ninkagaiFeatures, conditions['ninkagai24H']);
+        checkObj['ninkagai'] = true;
     }
-    if (conditions.yhoikuIchijiHoiku) {
-        yhoikuFeatures = ifIchijiHoiku(yhoikuFeatures, conditions.yhoikuIchijiHoiku);
-        yhoiku = true;
+    if (conditions['ninkagaiIchijiHoiku']) {
+        ninkagaiFeatures = ifIchijiHoiku(ninkagaiFeatures, conditions['ninkagaiIchijiHoiku']);
+        checkObj['ninkagai'] = true;
     }
-    if (conditions.yhoikuYakan) {
-        yhoikuFeatures = ifYakan(yhoikuFeatures, conditions.yhoikuYakan);
-        yhoiku = true;
+    if (conditions['ninkagaiYakan']) {
+        ninkagaiFeatures = ifYakan(ninkagaiFeatures, conditions['ninkagaiYakan']);
+        checkObj['ninkagai'] = true;
     }
-    if (conditions.yhoikuKyujitu) {
-        yhoikuFeatures = ifKyujitu(yhoikuFeatures, conditions.yhoikuKyujitu);
-        yhoiku = true;
+    if (conditions['ninkagaiKyujitu']) {
+        ninkagaiFeatures = ifKyujitu(ninkagaiFeatures, conditions['ninkagaiKyujitu']);
+        checkObj['ninkagai'] = true;
     }
-    if (conditions.yhoikuEncho) {
-        yhoikuFeatures = ifEncho(yhoikuFeatures, conditions.yhoikuEncho);
-        yhoiku = true;
+    if (conditions['ninkagaiEncho']) {
+        ninkagaiFeatures = ifEncho(ninkagaiFeatures, conditions['ninkagaiEncho']);
+        checkObj['ninkagai'] = true;
     }
-    if (conditions.yhoikuVacancy) {
-        yhoikuFeatures = ifVacancy(yhoikuFeatures, conditions.yhoikuVacancy);
-        yhoiku = true;
+    if (conditions['ninkagaiVacancy']) {
+        ninkagaiFeatures = ifVacancy(ninkagaiFeatures, conditions['ninkagaiVacancy']);
+        checkObj['ninkagai'] = true;
     }
 
+    // ----------------------------------------------------------------------
+    // 横浜保育室向けフィルター
+    // ----------------------------------------------------------------------
+    if (conditions['yhoikuOpenTime']) {
+        yhoikuFeatures = ifOpenTime(yhoikuFeatures, conditions['yhoikuOpenTime']);
+        checkObj['yhoiku'] = true;
+    }
+    if (conditions['yhoikuCloseTime']) {
+        yhoikuFeatures = ifCloseTime(yhoikuFeatures, conditions['yhoikuCloseTime']);
+        checkObj['yhoiku'] = true;
+    }
+    if (conditions['yhoiku24H']) {
+        yhoikuFeatures = if24H(yhoikuFeatures, conditions['yhoiku24H']);
+        checkObj['yhoiku'] = true;
+    }
+    if (conditions['yhoikuIchijiHoiku']) {
+        yhoikuFeatures = ifIchijiHoiku(yhoikuFeatures, conditions['yhoikuIchijiHoiku']);
+        checkObj['yhoiku'] = true;
+    }
+    if (conditions['yhoikuYakan']) {
+        yhoikuFeatures = ifYakan(yhoikuFeatures, conditions['yhoikuYakan']);
+        checkObj['yhoiku'] = true;
+    }
+    if (conditions['yhoikuKyujitu']) {
+        yhoikuFeatures = ifKyujitu(yhoikuFeatures, conditions['yhoikuKyujitu']);
+        checkObj['yhoiku'] = true;
+    }
+    if (conditions['yhoikuEncho']) {
+        yhoikuFeatures = ifEncho(yhoikuFeatures, conditions['yhoikuEncho']);
+        checkObj['yhoiku'] = true;
+    }
+    if (conditions['yhoikuVacancy']) {
+        yhoikuFeatures = ifVacancy(yhoikuFeatures, conditions['yhoikuVacancy']);
+        checkObj['yhoiku'] = true;
+    }
 
-    if (conditions.kindergartenOpenTime) {
-        kindergartenFeatures = ifOpenTime(kindergartenFeatures, conditions.kindergartenOpenTime);
-        kindergarten = true;
+    // ----------------------------------------------------------------------
+    // 幼稚園向けフィルター
+    // ----------------------------------------------------------------------
+    if (conditions['kindergartenOpenTime']) {
+        kindergartenFeatures = ifOpenTime(kindergartenFeatures, conditions['kindergartenOpenTime']);
+        checkObj['kindergarten'] = true;
     }
-    if (conditions.kindergartenCloseTime) {
-        kindergartenFeatures = ifCloseTime(kindergartenFeatures, conditions.kindergartenCloseTime);
-        kindergarten = true;
+    if (conditions['kindergartenCloseTime']) {
+        kindergartenFeatures = ifCloseTime(kindergartenFeatures, conditions['kindergartenCloseTime']);
+        checkObj['kindergarten'] = true;
     }
-    if (conditions.kindergarten24H) {
-        kindergartenFeatures = if24H(kindergartenFeatures, conditions.kindergarten24H);
-        kindergarten = true;
+    if (conditions['kindergarten24H']) {
+        kindergartenFeatures = if24H(kindergartenFeatures, conditions['kindergarten24H']);
+        checkObj['kindergarten'] = true;
     }
-    if (conditions.kindergartenIchijiHoiku) {
-        kindergartenFeatures = ifIchijiHoiku(kindergartenFeatures, conditions.kindergartenIchijiHoiku);
-        kindergarten = true;
+    if (conditions['kindergartenIchijiHoiku']) {
+        kindergartenFeatures = ifIchijiHoiku(kindergartenFeatures, conditions['kindergartenIchijiHoiku']);
+        checkObj['kindergarten'] = true;
     }
-    if (conditions.kindergartenYakan) {
-        kindergartenFeatures = ifYakan(kindergartenFeatures, conditions.kindergartenYakan);
-        kindergarten = true;
+    if (conditions['kindergartenYakan']) {
+        kindergartenFeatures = ifYakan(kindergartenFeatures, conditions['kindergartenYakan']);
+        checkObj['kindergarten'] = true;
     }
-    if (conditions.kindergartenKyujitu) {
-        kindergartenFeatures = ifKyujitu(kindergartenFeatures, conditions.kindergartenKyujitu);
-        kindergarten = true;
+    if (conditions['kindergartenKyujitu']) {
+        kindergartenFeatures = ifKyujitu(kindergartenFeatures, conditions['kindergartenKyujitu']);
+        checkObj['kindergarten'] = true;
     }
-    if (conditions.kindergartenEncho) {
-        kindergartenFeatures = ifEncho(kindergartenFeatures, conditions.kindergartenEncho);
-        kindergarten = true;
+    if (conditions['kindergartenEncho']) {
+        kindergartenFeatures = ifEncho(kindergartenFeatures, conditions['kindergartenEncho']);
+        checkObj['kindergarten'] = true;
     }
-    if (conditions.kindergartenVacancy) {
-        kindergartenFeatures = ifVacancy(kindergartenFeatures, conditions.kindergartenVacancy);
-        kindergarten = true;
+    if (conditions['kindergartenVacancy']) {
+        kindergartenFeatures = ifVacancy(kindergartenFeatures, conditions['kindergartenVacancy']);
+        checkObj['kindergarten'] = true;
     }
 
     // 戻り値の作成

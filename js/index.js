@@ -336,8 +336,16 @@ $('#mainPage').on('pageshow', function() {
 
 		// 条件作成処理
 		var conditions = [];
-		var checkObj = {};
+		var checkObj = {
+			pubNinka: false,
+			priNinka: false,
+			ninkagai: false,
+			yhoiku: false,
+			kindergarten: false,
+			jigyosho: false,
+		};
 
+		// 検索フィルターのセレクト(filtersbクラス)で選択されたもののみ抽出
 		$('select.filtersb option:selected').map(function(index,item) {
 			if (item.value) {
 					var obj = {};
@@ -345,6 +353,7 @@ $('#mainPage').on('pageshow', function() {
 					conditions.push(obj);
 			}
 		});
+		// 検索フィルターのチェックボックス(filtercbクラス)で選択されたもののみ抽出
 		$('.filtercb').map(function(i,item ) {
 			if (item .checked) {
 					var obj = {};
@@ -359,16 +368,14 @@ $('#mainPage').on('pageshow', function() {
 				return Object.assign(p,c);
 			});
 			var filter = new FacilityFilter();
-			var filterResult = filter.getFilteredFeaturesGeoJson(conditions, nurseryFacilities);
-			papamamap.addNurseryFacilitiesLayer(filterResult.newGeoJson);
-			checkObj = filterResult.checkObj;
+			var newGeoJson = filter.getFilteredFeaturesGeoJson(conditions, nurseryFacilities, checkObj); // checkObjを参照渡しで表示レイヤーを取得する
+			papamamap.addNurseryFacilitiesLayer(newGeoJson);
 			$('#btnFilter').css('background-color', '#3388cc');
 
 		} else {
 			papamamap.addNurseryFacilitiesLayer(nurseryFacilities);
 			$('#btnFilter').css('background-color', '#f6f6f6');
-			['pubNinka', 'priNinka', 'ninkagai', 'yhoiku', 'kindergarten']
-			.map(function(index, item) {
+			Object.keys(checkObj).map(function(item) {
 				checkObj[item] = true;
 			});
 		}
