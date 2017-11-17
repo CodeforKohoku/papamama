@@ -514,3 +514,50 @@ $('#mainPage').on('pageshow', function() {
 		 $('#marker').hide();
 	 }
 });
+
+/**
+* 保育施設絞り込みの開園時間のselectタグのoptionの生成
+**/
+function openTime()
+{
+	var startHour = 7;
+	var endHour = 8;
+	var options = '<option value="">開園</option>';
+	for(var hour = startHour ; hour <=endHour; hour++){
+		  options += '<option value="' + hour + ':00">' + hour + ':00以前</option>';
+		  options += '<option value="' + hour + ':15">' + hour + ':15以前</option>';
+		  options += '<option value="' + hour + ':45">' + hour + ':45以前</option>';
+	}
+	options += '<option value="9:00">9:00以前</option>';
+
+	document.getElementById("pubNinkaOpenTime").innerHTML = options;
+	document.getElementById("priNinkaOpenTime").innerHTML = options;
+	document.getElementById("yhoikuOpenTime").innerHTML = options;
+	document.getElementById("ninkagaiOpenTime").innerHTML = options;
+	document.getElementById("kindergartenOpenTime").innerHTML = options;
+	return;
+}
+
+/**
+* 保育施設絞り込みの終園時間のselectタグのoptionの生成
+**/
+function closeTime()
+{
+	var startHour = 18;
+	var endHour = 21;
+	var options = '<option value="">終園</option>';
+	for(var hour = startHour ; hour <=endHour; hour++){
+		  options += '<option value="' + hour + ':00">' + hour + ':00以降</option>';
+		  options += '<option value="' + hour + ':30">' + hour + ':30以降</option>';
+	}
+	options += '<option value="22:00">22:00以前</option>';
+
+	document.getElementById("pubNinkaCloseTime").innerHTML = options;
+	document.getElementById("priNinkaCloseTime").innerHTML = options;
+	document.getElementById("yhoikuCloseTime").innerHTML = options;
+	document.getElementById("ninkagaiCloseTime").innerHTML = options;
+	document.getElementById("kindergartenCloseTime").innerHTML = options;
+	return;
+}
+openTime();
+closeTime();
