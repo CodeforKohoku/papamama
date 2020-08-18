@@ -1,4 +1,9 @@
 /* CSS Document */
+
+body { /* disable scroll event propagation to outside map*/
+    overscroll-behavior: contain;
+}
+
 .ui-content {
 	margin: 0;
 	padding: 0 !important;
